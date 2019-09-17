@@ -2,6 +2,10 @@ import datetime
 import subprocess
 
 
+def get_command_list():
+	return []
+
+
 def load_configuration(environment):
 	configuration = {
 		"project": "bhamon-dev-scripts",
