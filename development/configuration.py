@@ -50,6 +50,7 @@ def load_commands():
 		"development.commands.clean",
 		"development.commands.develop",
 		"development.commands.distribute",
+		"development.commands.lint",
 	]
 
 	return [ import_command(module) for module in all_modules ]

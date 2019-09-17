@@ -18,7 +18,7 @@ def clean(configuration, simulate):
 	logger.info("Cleaning the workspace")
 	print("")
 
-	directories_to_clean = []
+	directories_to_clean = [ ".artifacts", "test_results" ]
 
 	for component in configuration["components"]:
 		directories_to_clean.append(os.path.join(component["path"], "build"))
