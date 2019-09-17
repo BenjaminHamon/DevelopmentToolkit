@@ -1,0 +1,12 @@
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.egg-info/
+
+# Python virtual environment
+.venv/
+
+# Visual Studio Code
+.vscode/
