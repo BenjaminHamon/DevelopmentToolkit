@@ -1,3 +1,13 @@
+# Build artifacts
+.artifacts/
+
+# Distribution
+/toolkit/build/
+/toolkit/dist/
+
+# Environment
+environment.json
+
 # Generated metadata
 __metadata__.py
 

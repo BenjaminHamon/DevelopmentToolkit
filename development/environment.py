@@ -36,6 +36,9 @@ def configure_log_file(log_level, log_file):
 def create_default_environment():
 	return {
 		"git_executable": "git",
+		"python3_executable": "python3",
+		"scp_executable": "scp",
+		"ssh_executable": "ssh",
 	}
 
 
