@@ -1,15 +1,18 @@
 import os
+import sys
 
 import setuptools
 
-import environment
-import configuration
+sys.path.insert(0, os.path.join(sys.path[0], ".."))
+
+import development.configuration # pylint: disable = wrong-import-position
+import development.environment # pylint: disable = wrong-import-position
 
 
 def run_setup():
-	environment_instance = environment.load_environment()
-	configuration_instance = configuration.load_configuration(environment_instance)
-	parameters = configuration.get_setuptools_parameters(configuration_instance)
+	environment_instance = development.environment.load_environment()
+	configuration_instance = development.configuration.load_configuration(environment_instance)
+	parameters = development.configuration.get_setuptools_parameters(configuration_instance)
 
 	parameters.update({
 		"name": "bhamon-dev-scripts",
