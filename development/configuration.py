@@ -1,9 +1,13 @@
 import datetime
 import subprocess
 
+import development.commands.clean
+
 
 def get_command_list():
-	return []
+	return [
+		development.commands.clean,
+	]
 
 
 def load_configuration(environment):
@@ -28,6 +32,10 @@ def load_configuration(environment):
 	configuration["author_email"] = "hamon.benjamin@gmail.com"
 	configuration["project_url"] = "https://github.com/BenjaminHamon/DevScripts"
 	configuration["copyright"] = "Copyright (c) 2019 Benjamin Hamon"
+
+	configuration["components"] = [
+		{ "name": "bhamon-dev-scripts", "path": "toolkit", "packages": [ "bhamon_dev_scripts" ] },
+	]
 
 	return configuration
 
