@@ -12,7 +12,7 @@ logger = logging.getLogger("Test")
 pytest_status_collection = [ "error", "failed", "passed", "skipped", "xfailed", "xpassed" ]
 
 
-def run_pytest(python_executable, output_directory, run_identifier, target, filter_expression, simulate): # pylint: disable = too-many-locals
+def run_pytest(python_executable, output_directory, run_identifier, target, filter_expression, simulate): # pylint: disable = too-many-arguments, too-many-locals
 	intermediate_report_file_path = os.path.join(output_directory, str(run_identifier) + "_intermediate.json")
 
 	pytest_command = [ python_executable, "-m", "pytest", target, "--verbose" ]
@@ -85,7 +85,7 @@ def _simulate_intermediate_report():
 	}
 
 
-def _generate_report(run_identifier, job_parameters, intermediate_report, success, start_date, completion_date):
+def _generate_report(run_identifier, job_parameters, intermediate_report, success, start_date, completion_date): # pylint: disable = too-many-arguments
 	summary = { "total": intermediate_report["summary"]["num_tests"] }
 	for status in pytest_status_collection:
 		summary[status] = intermediate_report["summary"].get(status, 0)
