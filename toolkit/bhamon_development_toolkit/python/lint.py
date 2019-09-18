@@ -3,7 +3,7 @@ import logging
 import os
 import subprocess
 
-import bhamon_dev_scripts.workspace
+import bhamon_development_toolkit.workspace
 
 
 logger = logging.getLogger("Lint")
@@ -64,14 +64,14 @@ def run_pylint(python_executable, output_directory, run_identifier, target, simu
 
 	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
 	if not simulate:
-		bhamon_dev_scripts.workspace.save_test_report(result_file_path, report)
+		bhamon_development_toolkit.workspace.save_test_report(result_file_path, report)
 
 	return report
 
 
 def get_aggregated_results(output_directory, run_identifier):
 	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
-	all_reports = bhamon_dev_scripts.workspace.load_test_reports(result_file_path)
+	all_reports = bhamon_development_toolkit.workspace.load_test_reports(result_file_path)
 
 	success = True
 	summary = { category: 0 for category in pylint_categories }

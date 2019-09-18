@@ -6,8 +6,8 @@ import sys
 
 def load_configuration(environment):
 	configuration = {
-		"project": "bhamon-dev-scripts",
-		"project_name": "Development Scripts",
+		"project": "bhamon-development-toolkit",
+		"project_name": "Development Toolkit",
 		"project_version": { "identifier": "1.0" },
 	}
 
@@ -24,13 +24,13 @@ def load_configuration(environment):
 
 	configuration["author"] = "Benjamin Hamon"
 	configuration["author_email"] = "hamon.benjamin@gmail.com"
-	configuration["project_url"] = "https://github.com/BenjaminHamon/DevScripts"
+	configuration["project_url"] = "https://github.com/BenjaminHamon/DevelopmentToolkit"
 	configuration["copyright"] = "Copyright (c) 2019 Benjamin Hamon"
 
 	configuration["development_dependencies"] = [ "pylint", "wheel" ]
 
 	configuration["components"] = [
-		{ "name": "bhamon-dev-scripts", "path": "toolkit", "packages": [ "bhamon_dev_scripts" ] },
+		{ "name": "bhamon-development-toolkit", "path": "toolkit", "packages": [ "bhamon_development_toolkit" ] },
 	]
 
 	return configuration

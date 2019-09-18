@@ -1,8 +1,8 @@
 import logging
 import uuid
 
-import bhamon_dev_scripts.python.lint
-import bhamon_dev_scripts.workspace
+import bhamon_development_toolkit.python.lint
+import bhamon_development_toolkit.workspace
 
 
 logger = logging.getLogger("Main")
@@ -28,7 +28,7 @@ def lint_packages(python_executable, run_identifier, component_collection, simul
 	all_results = []
 
 	for component in component_collection:
-		pylint_results = bhamon_dev_scripts.python.lint.run_pylint(python_executable, "test_results", run_identifier, component["packages"][0], simulate)
+		pylint_results = bhamon_development_toolkit.python.lint.run_pylint(python_executable, "test_results", run_identifier, component["packages"][0], simulate)
 		print("")
 
 		component_results = { "name": component["name"] }
@@ -40,12 +40,12 @@ def lint_packages(python_executable, run_identifier, component_collection, simul
 
 
 def save_results(run_identifier, result_file_path, simulate):
-	test_results = bhamon_dev_scripts.python.lint.get_aggregated_results("test_results", run_identifier)
+	test_results = bhamon_development_toolkit.python.lint.get_aggregated_results("test_results", run_identifier)
 
 	if result_file_path:
-		results = bhamon_dev_scripts.workspace.load_results(result_file_path)
+		results = bhamon_development_toolkit.workspace.load_results(result_file_path)
 		results["tests"] = results.get("tests", [])
 		results["tests"].append(test_results)
 
 		if not simulate:
-			bhamon_dev_scripts.workspace.save_results(result_file_path, results)
+			bhamon_development_toolkit.workspace.save_results(result_file_path, results)

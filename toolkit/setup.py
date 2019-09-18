@@ -15,12 +15,12 @@ def run_setup():
 	parameters = development.configuration.get_setuptools_parameters(configuration_instance)
 
 	parameters.update({
-		"name": "bhamon-dev-scripts",
+		"name": "bhamon-development-toolkit",
 		"description": "Toolkit for software development scripts",
 
 		"packages": [
-			"bhamon_dev_scripts",
-			"bhamon_dev_scripts/python",
+			"bhamon_development_toolkit",
+			"bhamon_development_toolkit/python",
 		],
 
 		"python_requires": "~= 3.5",
