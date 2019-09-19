@@ -65,6 +65,18 @@ def merge_mappings(artifact_files):
 	return merged_files
 
 
+def check_files(artifact_files):
+	has_issues = False
+
+	for file_path in artifact_files:
+		if not os.path.exists(file_path):
+			has_issues = True
+			logger.error("Missing file: %s", file_path)
+
+	if has_issues:
+		raise ValueError("Artifact files have issues")
+
+
 def load_fileset(fileset, parameters):
 	matched_files = []
 	path_in_workspace = fileset["path_in_workspace"].format(**parameters)
@@ -77,7 +89,7 @@ def load_fileset(fileset, parameters):
 	selected_files = []
 	for file_path in matched_files:
 		file_path = file_path.replace("\\", "/")
-		if os.path.isfile(file_path):
+		if not os.path.isdir(file_path):
 			selected_files.append(file_path)
 
 	selected_files.sort()
