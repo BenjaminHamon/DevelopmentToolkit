@@ -20,6 +20,7 @@ def run_setup():
 
 		"packages": [
 			"bhamon_development_toolkit",
+			"bhamon_development_toolkit/artifacts",
 			"bhamon_development_toolkit/python",
 		],
 
