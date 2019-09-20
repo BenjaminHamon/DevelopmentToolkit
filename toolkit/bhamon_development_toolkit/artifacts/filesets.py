@@ -83,6 +83,8 @@ def load_fileset(fileset, parameters):
 
 	for file_function in fileset.get("file_functions", []):
 		matched_files += file_function(path_in_workspace, parameters)
+	for file_path in fileset.get("file_paths", []):
+		matched_files += [ os.path.join(path_in_workspace, file_path.format(**parameters)) ]
 	for file_pattern in fileset.get("file_patterns", []):
 		matched_files += glob.glob(os.path.join(path_in_workspace, file_pattern.format(**parameters)), recursive = True)
 
