@@ -4,7 +4,7 @@ import logging
 import os
 import subprocess
 
-import bhamon_development_toolkit
+import bhamon_development_toolkit.workspace
 
 
 logger = logging.getLogger("Test")
