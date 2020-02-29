@@ -30,7 +30,7 @@ def load_configuration(environment):
 	configuration["development_dependencies"] = [ "pylint", "wheel" ]
 
 	configuration["components"] = [
-		{ "name": "bhamon-development-toolkit", "path": "toolkit", "packages": [ "bhamon_development_toolkit" ] },
+		{ "name": "bhamon-development-toolkit", "path": "toolkit" },
 	]
 
 	return configuration

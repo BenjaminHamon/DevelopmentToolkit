@@ -25,7 +25,7 @@ def run(environment, configuration, arguments): # pylint: disable = unused-argum
 		os.makedirs(os.path.join("test_results", run_identifier))
 
 	for component in configuration["components"]:
-		pylint_results = python_lint.run_pylint(environment["python3_executable"], "test_results", run_identifier, component["packages"][0], simulate = arguments.simulate)
+		pylint_results = python_lint.run_pylint(environment["python3_executable"], "test_results", run_identifier, component["name"].replace("-", "_"), simulate = arguments.simulate)
 		if not pylint_results["success"]:
 			session_success = False
 
