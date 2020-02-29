@@ -2,9 +2,8 @@ import datetime
 import json
 import logging
 import os
+import shutil
 import subprocess
-
-import bhamon_development_toolkit.workspace
 
 
 logger = logging.getLogger("Test")
@@ -12,24 +11,28 @@ logger = logging.getLogger("Test")
 pytest_status_collection = [ "error", "failed", "passed", "skipped", "xfailed", "xpassed" ]
 
 
-def run_pytest(python_executable, output_directory, run_identifier, target, filter_expression, simulate): # pylint: disable = too-many-arguments, too-many-locals
-	intermediate_report_file_path = os.path.join(output_directory, str(run_identifier) + "_intermediate.json")
+def run_pytest(python_executable, result_directory, run_identifier, target, filter_expression, simulate): # pylint: disable = too-many-arguments, too-many-locals
+	logger.info("Running test session (RunIdentifier: '%s', Target: '%s', Filter: '%s')", run_identifier, target, filter_expression)
+
+	result_directory = os.path.join(result_directory, str(run_identifier))
+	intermediate_report_file_path = os.path.join(result_directory, "test_report_intermediate.json")
+	report_file_path = os.path.join(result_directory, "test_report.json")
+
+	if not simulate:
+		if os.path.exists(result_directory):
+			shutil.rmtree(result_directory)
+		os.makedirs(result_directory)
 
 	pytest_command = [ python_executable, "-m", "pytest", target, "--verbose" ]
 	pytest_command += [ "--collect-only" ] if simulate else []
-	pytest_command += [ "--basetemp", os.path.join(output_directory, str(run_identifier)) ]
+	pytest_command += [ "--basetemp", result_directory ]
 	pytest_command += [ "-k", filter_expression ] if filter_expression else []
-	report_options = [ "--json", intermediate_report_file_path ]
+	output_options = [ "--json", intermediate_report_file_path ] if not simulate else []
 
 	start_date = datetime.datetime.utcnow().replace(microsecond = 0).isoformat() + "Z"
 
 	logger.info("+ %s", " ".join(pytest_command))
-
-	if simulate:
-		result_code = subprocess.call(pytest_command)
-	else:
-		os.makedirs(output_directory, exist_ok = True)
-		result_code = subprocess.call(pytest_command + report_options)
+	result_code = subprocess.call(pytest_command + output_options)
 
 	success = result_code == 0
 	completion_date = datetime.datetime.utcnow().replace(microsecond = 0).isoformat() + "Z"
@@ -37,25 +40,25 @@ def run_pytest(python_executable, output_directory, run_identifier, target, filt
 	if simulate:
 		intermediate_report = _simulate_intermediate_report()
 	else:
-		with open(intermediate_report_file_path, "r") as intermediate_report_file:
+		with open(intermediate_report_file_path, mode = "r") as intermediate_report_file:
 			intermediate_report = json.load(intermediate_report_file)["report"]
 
 	job_parameters = { "target": target, "filter_expression": filter_expression }
 	report = _generate_report(run_identifier, job_parameters, intermediate_report, success, start_date, completion_date)
 
-	result_file_path = os.path.join(output_directory, str(run_identifier), "test_results.json")
 	if not simulate:
-		bhamon_development_toolkit.workspace.save_test_report(result_file_path, report)
-
-	if not simulate:
-		os.remove(intermediate_report_file_path)
+		with open(report_file_path, mode = "w") as report_file:
+			json.dump(report, report_file, indent = 4)
 
 	return report
 
 
-def get_aggregated_results(output_directory, run_identifier):
-	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
-	all_reports = bhamon_development_toolkit.workspace.load_test_reports(result_file_path)
+def get_aggregated_results(all_report_file_paths):
+	all_reports = []
+
+	for report_file_path in all_report_file_paths:
+		with open(report_file_path, mode = "r") as report_file:
+			all_reports.append(json.load(report_file))
 
 	success = True
 	summary = { "total": 0 }
@@ -69,7 +72,6 @@ def get_aggregated_results(output_directory, run_identifier):
 				summary[status] += report["summary"][status]
 
 	return {
-		"run_identifier": str(run_identifier),
 		"run_type": "pytest",
 		"success": success,
 		"summary": summary,
