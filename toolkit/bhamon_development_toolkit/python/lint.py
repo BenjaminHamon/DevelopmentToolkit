@@ -1,9 +1,8 @@
 import datetime
+import json
 import logging
 import os
 import subprocess
-
-import bhamon_development_toolkit.workspace
 
 
 logger = logging.getLogger("Lint")
@@ -22,7 +21,15 @@ pylint_message_elements = [
 ]
 
 
-def run_pylint(python_executable, output_directory, run_identifier, target, simulate): # pylint: disable = too-many-locals
+def run_pylint(python_executable, result_directory, run_identifier, target, simulate): # pylint: disable = too-many-locals
+	logger.info("Running linter (RunIdentifier: '%s', Target: '%s')", run_identifier, target)
+
+	result_directory = os.path.join(result_directory, str(run_identifier))
+	report_file_path = os.path.join(result_directory, os.path.normpath(target).replace(os.sep, "_") + ".json")
+
+	if not simulate:
+		os.makedirs(result_directory, exist_ok = True)
+
 	pylint_command = [ python_executable, "-u", "-m", "pylint", target ]
 	format_options = [ "--msg-template", pylint_message_separator.join([ "{" + element["pylint_field"] + "}" for element in pylint_message_elements ]) ]
 	start_date = datetime.datetime.utcnow().replace(microsecond = 0).isoformat() + "Z"
@@ -34,7 +41,6 @@ def run_pylint(python_executable, output_directory, run_identifier, target, simu
 		result_code = 0
 
 	else:
-		os.makedirs(output_directory, exist_ok = True)
 		process = subprocess.Popen(pylint_command + format_options, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, universal_newlines = True)
 		all_issues = _process_pylint_output(process.stdout)
 		result_code = process.wait()
@@ -62,16 +68,19 @@ def run_pylint(python_executable, output_directory, run_identifier, target, simu
 		"completion_date": completion_date,
 	}
 
-	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
 	if not simulate:
-		bhamon_development_toolkit.workspace.save_test_report(result_file_path, report)
+		with open(report_file_path, mode = "w") as report_file:
+			json.dump(report, report_file, indent = 4)
 
 	return report
 
 
-def get_aggregated_results(output_directory, run_identifier):
-	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
-	all_reports = bhamon_development_toolkit.workspace.load_test_reports(result_file_path)
+def get_aggregated_results(all_report_file_paths):
+	all_reports = []
+
+	for report_file_path in all_report_file_paths:
+		with open(report_file_path, mode = "r") as report_file:
+			all_reports.append(json.load(report_file))
 
 	success = True
 	summary = { category: 0 for category in pylint_categories }
@@ -83,7 +92,6 @@ def get_aggregated_results(output_directory, run_identifier):
 				summary[category] += report["summary"][category]
 
 	return {
-		"run_identifier": str(run_identifier),
 		"run_type": "pylint",
 		"success": success,
 		"summary": summary,

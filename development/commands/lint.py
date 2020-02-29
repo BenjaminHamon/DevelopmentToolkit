@@ -1,8 +1,11 @@
+import glob
 import logging
+import os
+import shutil
 import uuid
 
-import bhamon_development_toolkit.python.lint
-import bhamon_development_toolkit.workspace
+import bhamon_development_toolkit.python.lint as python_lint
+import bhamon_development_toolkit.workspace as workspace
 
 
 logger = logging.getLogger("Main")
@@ -13,39 +16,35 @@ def configure_argument_parser(environment, configuration, subparsers): # pylint:
 
 
 def run(environment, configuration, arguments): # pylint: disable = unused-argument
-	run_identifier = uuid.uuid4()
+	run_identifier = str(uuid.uuid4())
+	session_success = True
 
-	try:
-		lint_packages(environment["python3_executable"], run_identifier, configuration["components"], arguments.simulate)
-	finally:
-		save_results(run_identifier, arguments.results, arguments.simulate)
+	if not arguments.simulate:
+		if os.path.exists(os.path.join("test_results", run_identifier)):
+			shutil.rmtree(os.path.join("test_results", run_identifier))
+		os.makedirs(os.path.join("test_results", run_identifier))
 
+	for component in configuration["components"]:
+		pylint_results = python_lint.run_pylint(environment["python3_executable"], "test_results", run_identifier, component["packages"][0], simulate = arguments.simulate)
+		if not pylint_results["success"]:
+			session_success = False
 
-def lint_packages(python_executable, run_identifier, component_collection, simulate):
-	logger.info("Running linter for packages (RunIdentifier: %s)", run_identifier)
-	print("")
-
-	all_results = []
-
-	for component in component_collection:
-		pylint_results = bhamon_development_toolkit.python.lint.run_pylint(python_executable, "test_results", run_identifier, component["packages"][0], simulate)
 		print("")
 
-		component_results = { "name": component["name"] }
-		component_results.update(pylint_results)
-		all_results.append(component_results)
+	if arguments.results:
+		save_results(arguments.results, "test_results", run_identifier, simulate = arguments.simulate)
 
-	if any(not result["success"] for result in all_results):
+	if not session_success:
 		raise RuntimeError("Linting failed")
 
 
-def save_results(run_identifier, result_file_path, simulate):
-	test_results = bhamon_development_toolkit.python.lint.get_aggregated_results("test_results", run_identifier)
+def save_results(result_file_path, result_directory, run_identifier, simulate):
+	all_report_file_paths = glob.glob(os.path.join(result_directory, run_identifier, "*.json"))
+	reports_as_results = python_lint.get_aggregated_results(all_report_file_paths)
 
-	if result_file_path:
-		results = bhamon_development_toolkit.workspace.load_results(result_file_path)
-		results["tests"] = results.get("tests", [])
-		results["tests"].append(test_results)
+	results = workspace.load_results(result_file_path)
+	results["tests"] = results.get("tests", [])
+	results["tests"].append(reports_as_results)
 
-		if not simulate:
-			bhamon_development_toolkit.workspace.save_results(result_file_path, results)
+	if not simulate:
+		workspace.save_results(result_file_path, results)
