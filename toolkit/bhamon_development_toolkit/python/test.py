@@ -43,7 +43,7 @@ def run_pytest(python_executable, output_directory, run_identifier, target, filt
 	job_parameters = { "target": target, "filter_expression": filter_expression }
 	report = _generate_report(run_identifier, job_parameters, intermediate_report, success, start_date, completion_date)
 
-	result_file_path = os.path.join(output_directory, str(run_identifier) + ".json")
+	result_file_path = os.path.join(output_directory, str(run_identifier), "test_results.json")
 	if not simulate:
 		bhamon_development_toolkit.workspace.save_test_report(result_file_path, report)
 
