@@ -31,8 +31,8 @@ class ArtifactRepository:
 		return self.server_client.list_files_with_metadata(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
 
 
-	def package( # pylint: disable = too-many-arguments
-            self, path_in_repository, artifact_name, artifact_files, compression = zipfile.ZIP_DEFLATED, compression_level = None, simulate = False):
+	def package(self, # pylint: disable = too-many-arguments
+			path_in_repository, artifact_name, artifact_files, compression = zipfile.ZIP_DEFLATED, compression_level = None, simulate = False):
 		logger.info("Packaging artifact '%s'", artifact_name)
 
 		if len(artifact_files) == 0:
@@ -56,7 +56,7 @@ class ArtifactRepository:
 			os.replace(artifact_path + ".zip.tmp", artifact_path + ".zip")
 
 
-	def verify(self, path_in_repository, artifact_name, simulate):
+	def verify(self, path_in_repository, artifact_name, simulate = False):
 		logger.info("Verifying artifact '%s'", artifact_name)
 
 		artifact_path = os.path.join(self.local_path, path_in_repository, artifact_name)
@@ -68,15 +68,15 @@ class ArtifactRepository:
 					raise RuntimeError('Artifact package is corrupted')
 
 
-	def upload(self, path_in_repository, artifact_name, overwrite, simulate):
-		self.server_client.upload(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", overwrite, simulate)
+	def upload(self, path_in_repository, artifact_name, overwrite = False, simulate = False):
+		self.server_client.upload(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", overwrite = overwrite, simulate = simulate)
 
 
-	def download(self, path_in_repository, artifact_name, simulate):
-		self.server_client.download(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", simulate)
+	def download(self, path_in_repository, artifact_name, simulate = False):
+		self.server_client.download(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", simulate = simulate)
 
 
-	def install(self, path_in_repository, artifact_name, installation_directory, simulate):
+	def install(self, path_in_repository, artifact_name, installation_directory, simulate = False):
 		logger.info("Installing artifact '%s' to '%s'", artifact_name, installation_directory)
 
 		artifact_path = os.path.join(self.local_path, path_in_repository, artifact_name)
@@ -111,5 +111,5 @@ class ArtifactRepository:
 			shutil.rmtree(extraction_directory)
 
 
-	def delete_remote(self, path_in_repository, artifact_name, simulate):
-		self.server_client.delete(self.project_identifier, path_in_repository, artifact_name, ".zip", simulate)
+	def delete_remote(self, path_in_repository, artifact_name, simulate = False):
+		self.server_client.delete(self.project_identifier, path_in_repository, artifact_name, ".zip", simulate = simulate)
