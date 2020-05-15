@@ -52,7 +52,7 @@ class ArtifactRepository:
 				for source, destination in artifact_files:
 					logger.debug("+ '%s' => '%s'", source, destination)
 					archive_file.write(source, destination)
-			shutil.move(artifact_path + ".zip.tmp", artifact_path + ".zip")
+			os.replace(artifact_path + ".zip.tmp", artifact_path + ".zip")
 
 
 	def verify(self, path_in_repository, artifact_name, simulate):

@@ -91,7 +91,7 @@ def package( # pylint: disable = too-many-arguments
 	if not simulate:
 		os.makedirs(os.path.dirname(destination_path), exist_ok = True)
 		shutil.copyfile(source_path, destination_path + ".tmp")
-		shutil.move(destination_path + ".tmp", destination_path)
+		os.replace(destination_path + ".tmp", destination_path)
 
 
 def save_upload_results(component, version, result_file_path, simulate):

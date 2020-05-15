@@ -64,7 +64,7 @@ class PythonPackageRepositoryFileClient:
 		logger.info("Copying '%s' to '%s'", source_path, destination_path)
 		if not simulate:
 			shutil.copyfile(source_path, destination_path + ".tmp")
-			shutil.move(destination_path + ".tmp", destination_path)
+			os.replace(destination_path + ".tmp", destination_path)
 
 
 

@@ -89,7 +89,7 @@ class ArtifactServerFileClient:
 		logger.info("Copying '%s' to '%s'", local_artifact_path + file_extension, remote_artifact_path + file_extension)
 		if not simulate:
 			shutil.copyfile(local_artifact_path + file_extension, remote_artifact_path + file_extension + ".tmp")
-			shutil.move(remote_artifact_path + file_extension + ".tmp", remote_artifact_path + file_extension)
+			os.replace(remote_artifact_path + file_extension + ".tmp", remote_artifact_path + file_extension)
 
 
 	def download(self, local_repository, remote_repository, path_in_repository, artifact_name, file_extension, simulate): # pylint: disable = too-many-arguments
@@ -104,7 +104,7 @@ class ArtifactServerFileClient:
 		logger.info("Copying '%s' to '%s'", remote_artifact_path + file_extension, local_artifact_path + file_extension)
 		if not simulate:
 			shutil.copyfile(remote_artifact_path + file_extension, local_artifact_path + file_extension + ".tmp")
-			shutil.move(local_artifact_path + file_extension + ".tmp", local_artifact_path + file_extension)
+			os.replace(local_artifact_path + file_extension + ".tmp", local_artifact_path + file_extension)
 
 
 	def delete(self, repository, path_in_repository, artifact_name, file_extension, simulate): # pylint: disable = too-many-arguments
@@ -227,4 +227,4 @@ class ArtifactServerSshClient:
 				raise RuntimeError("Failed to connect to the SSH server")
 			if download_result != 0:
 				raise RuntimeError("Failed to download the artifact")
-			shutil.move(local_artifact_path + file_extension + ".tmp", local_artifact_path + file_extension)
+			os.replace(local_artifact_path + file_extension + ".tmp", local_artifact_path + file_extension)
