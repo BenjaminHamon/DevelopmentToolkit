@@ -12,24 +12,25 @@ logger = logging.getLogger("Main")
 
 
 def main():
-	current_directory = os.getcwd()
-	script_path = os.path.realpath(__file__)
-	workspace_directory = os.path.dirname(os.path.dirname(script_path))
+	with development.environment.execute_in_workspace(__file__):
+		environment_instance = development.environment.load_environment()
+		configuration_instance = development.configuration.load_configuration(environment_instance) # pylint: disable = unused-variable
+		development.environment.configure_logging(environment_instance, None)
 
-	os.chdir(workspace_directory)
+		global_status = { "success": True }
 
-	try:
-		development.environment.configure_logging(logging.INFO)
-		command_list = development.configuration.load_commands()
-		check_commands(command_list)
+		check_commands(global_status)
 
-	finally:
-		os.chdir(current_directory)
+	if not global_status["success"]:
+		raise RuntimeError("Check found issues")
 
 
-def check_commands(command_list):
+def check_commands(global_status):
+	command_list = development.configuration.load_commands()
+
 	for command in command_list:
 		if "exception" in command:
+			global_status["success"] = False
 			logger.error("Command '%s' is unavailable", command["module_name"], exc_info = command["exception"])
 			print("")
 
