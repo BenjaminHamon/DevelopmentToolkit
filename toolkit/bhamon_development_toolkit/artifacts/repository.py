@@ -31,7 +31,8 @@ class ArtifactRepository:
 		return self.server_client.list_files_with_metadata(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
 
 
-	def package(self, path_in_repository, artifact_name, artifact_files, simulate):
+	def package( # pylint: disable = too-many-arguments
+            self, path_in_repository, artifact_name, artifact_files, compression = zipfile.ZIP_DEFLATED, compression_level = None, simulate = False):
 		logger.info("Packaging artifact '%s'", artifact_name)
 
 		if len(artifact_files) == 0:
@@ -48,7 +49,7 @@ class ArtifactRepository:
 			for source, destination in artifact_files:
 				logger.debug("+ '%s' => '%s'", source, destination)
 		else:
-			with zipfile.ZipFile(artifact_path + ".zip.tmp", "w", zipfile.ZIP_DEFLATED) as archive_file:
+			with zipfile.ZipFile(artifact_path + ".zip.tmp", mode = "w", compression = compression, compresslevel = compression_level) as archive_file:
 				for source, destination in artifact_files:
 					logger.debug("+ '%s' => '%s'", source, destination)
 					archive_file.write(source, destination)
