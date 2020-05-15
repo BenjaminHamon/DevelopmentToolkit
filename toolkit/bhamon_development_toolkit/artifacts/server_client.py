@@ -9,7 +9,7 @@ import subprocess
 
 logger = logging.getLogger("Artifact")
 
-file_url_regex = re.compile(r"^file:///(?P<path>([a-zA-Z]:)?[a-zA-Z0-9_\-\./]+)$")
+file_url_regex = re.compile(r"^file://(?P<host>[a-zA-Z0-9_\-\.]*)/(?P<path>([a-zA-Z]:)?[a-zA-Z0-9_\-\./]+)$")
 ssh_url_regex = re.compile(r"^ssh://(?P<user>[a-zA-Z0-9_\-]+)@(?P<host>[a-zA-Z0-9_\-\.]+):(?P<path>[a-zA-Z0-9_\-\./]+)$")
 
 
@@ -32,8 +32,11 @@ class ArtifactServerFileClient:
 	""" Client for an artifact server using file system operations """
 
 
-	def __init__(self, path):
-		self.server_path = os.path.normpath(path)
+	def __init__(self, host, path):
+		if host is None or host == "":
+			self.server_path = os.path.normpath(path)
+		else:
+			self.server_path = "\\\\" + host + "\\" + os.path.normpath(path)
 
 
 	def exists(self, repository, path_in_repository, artifact_name, file_extension):
