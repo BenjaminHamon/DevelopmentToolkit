@@ -111,6 +111,20 @@ class ArtifactServerFileClient:
 			os.remove(file_path)
 
 
+	def delete_empty_directories(self, repository, path_in_repository, simulate):
+		current_directory = os.path.join(self.server_path, repository)
+		if path_in_repository is not None:
+			current_directory = os.path.join(current_directory, path_in_repository)
+
+		for file_entry in os.listdir(current_directory):
+			if os.path.isdir(os.path.join(current_directory, file_entry)):
+				self.delete_empty_directories(repository, os.path.join(current_directory, file_entry), simulate)
+
+		if len(os.listdir(current_directory)) == 0:
+			if not simulate:
+				os.rmdir(current_directory)
+
+
 
 class ArtifactServerSshClient:
 	""" Client for an artifact server using SSH operations """
