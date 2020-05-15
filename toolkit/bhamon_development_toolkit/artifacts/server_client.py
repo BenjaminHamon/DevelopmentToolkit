@@ -39,6 +39,11 @@ class ArtifactServerFileClient:
 			self.server_path = "\\\\" + host + "\\" + os.path.normpath(path)
 
 
+	def check_access(self):
+		if not os.path.exists(self.server_path):
+			raise RuntimeError("Artifact server is unreachable")
+
+
 	def exists(self, repository, path_in_repository, artifact_name, file_extension):
 		remote_artifact_path = os.path.join(self.server_path, repository, path_in_repository, artifact_name)
 		return os.path.exists(remote_artifact_path + file_extension)
