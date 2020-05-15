@@ -95,7 +95,7 @@ def load_fileset(fileset, parameters):
 	selected_files = []
 	for file_path in matched_files:
 		file_path = file_path.replace("\\", "/")
-		if not os.path.isdir(file_path):
+		if os.path.isfile(file_path):
 			selected_files.append(file_path)
 
 	selected_files.sort()
