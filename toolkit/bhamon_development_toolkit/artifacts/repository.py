@@ -23,6 +23,10 @@ class ArtifactRepository:
 			logger.info("+ '%s'", file_path)
 
 
+	def list_remote(self, path_in_repository, artifact_pattern):
+		return self.server_client.get_list(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
+
+
 	def package(self, path_in_repository, artifact_name, artifact_files, simulate):
 		logger.info("Packaging artifact '%s'", artifact_name)
 

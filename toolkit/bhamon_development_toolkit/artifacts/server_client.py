@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import re
@@ -37,6 +38,12 @@ class ArtifactServerFileClient:
 	def exists(self, repository, path_in_repository, artifact_name, file_extension):
 		remote_artifact_path = os.path.join(self.server_path, repository, path_in_repository, artifact_name)
 		return os.path.exists(remote_artifact_path + file_extension)
+
+
+	def get_list(self, repository, path_in_repository, artifact_pattern, file_extension):
+		artifact_directory = os.path.join(self.server_path, repository, path_in_repository)
+		all_artifact_paths = glob.glob(os.path.join(artifact_directory, artifact_pattern + file_extension))
+		return [ os.path.basename(path[ : - len(file_extension) ]) for path in all_artifact_paths ]
 
 
 	def create_directory(self, repository, path_in_repository, simulate):
