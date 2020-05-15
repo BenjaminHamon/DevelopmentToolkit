@@ -6,7 +6,7 @@ import sys
 
 def load_configuration(environment):
 	configuration = {
-		"project": "bhamon-development-toolkit",
+		"project_identifier": "bhamon-development-toolkit",
 		"project_name": "Development Toolkit",
 		"project_version": load_project_version(environment["git_executable"], "1.0"),
 	}
