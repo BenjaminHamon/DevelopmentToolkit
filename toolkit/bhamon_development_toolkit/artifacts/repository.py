@@ -76,11 +76,13 @@ class ArtifactRepository:
 		self.server_client.download(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", simulate = simulate)
 
 
-	def install(self, path_in_repository, artifact_name, installation_directory, simulate = False):
+	def install(self, # pylint: disable = too-many-arguments
+			path_in_repository, artifact_name, installation_directory, extraction_directory = None, simulate = False):
 		logger.info("Installing artifact '%s' to '%s'", artifact_name, installation_directory)
 
 		artifact_path = os.path.join(self.local_path, path_in_repository, artifact_name)
-		extraction_directory = os.path.join(self.local_path, ".extracting")
+		if extraction_directory is None:
+			extraction_directory = artifact_path + ".zip.extracting"
 
 		if not simulate and os.path.isdir(extraction_directory):
 			shutil.rmtree(extraction_directory)
