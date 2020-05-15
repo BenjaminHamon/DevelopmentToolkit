@@ -1,6 +1,7 @@
 import copy
 import filecmp
 import glob
+import itertools
 import logging
 import os
 
@@ -49,8 +50,11 @@ def merge_mappings(artifact_files):
 	merged_files = []
 	has_conflicts = False
 
-	for destination in set(dst for src, dst in artifact_files):
-		source_collection = [ src for src, dst in artifact_files if dst == destination ]
+	sorted_by_destination = sorted(artifact_files, key = lambda x: x[1])
+	grouped_by_destination = itertools.groupby(sorted_by_destination, lambda x: x[1])
+
+	for destination, mapping_group in grouped_by_destination:
+		source_collection = [ x[0] for x in mapping_group ]
 		for source in source_collection[1:]:
 			if not filecmp.cmp(source_collection[0], source):
 				has_conflicts = True
@@ -91,7 +95,7 @@ def load_fileset(fileset, parameters):
 	selected_files = []
 	for file_path in matched_files:
 		file_path = file_path.replace("\\", "/")
-		if not os.path.isdir(file_path):
+		if os.path.isfile(file_path):
 			selected_files.append(file_path)
 
 	selected_files.sort()
