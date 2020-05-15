@@ -104,6 +104,13 @@ class ArtifactServerFileClient:
 			shutil.move(local_artifact_path + file_extension + ".tmp", local_artifact_path + file_extension)
 
 
+	def delete(self, repository, path_in_repository, artifact_name, file_extension, simulate): # pylint: disable = too-many-arguments
+		logger.info("Deleting artifact '%s'", artifact_name)
+		file_path = os.path.join(self.server_path, repository, path_in_repository, artifact_name + file_extension)
+		if not simulate:
+			os.remove(file_path)
+
+
 
 class ArtifactServerSshClient:
 	""" Client for an artifact server using SSH operations """

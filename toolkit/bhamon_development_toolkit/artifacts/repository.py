@@ -108,3 +108,7 @@ class ArtifactRepository:
 
 		if not simulate:
 			shutil.rmtree(extraction_directory)
+
+
+	def delete_remote(self, path_in_repository, artifact_name, simulate):
+		self.server_client.delete(self.project_identifier, path_in_repository, artifact_name, ".zip", simulate)
