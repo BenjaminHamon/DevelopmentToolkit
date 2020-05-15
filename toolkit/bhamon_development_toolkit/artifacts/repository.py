@@ -40,10 +40,10 @@ class ArtifactRepository:
 			for source, destination in artifact_files:
 				logger.info("+ '%s' => '%s'", source, destination)
 		else:
-			with zipfile.ZipFile(artifact_path + ".zip.tmp", "w", zipfile.ZIP_DEFLATED) as artifact_file:
+			with zipfile.ZipFile(artifact_path + ".zip.tmp", "w", zipfile.ZIP_DEFLATED) as archive_file:
 				for source, destination in artifact_files:
 					logger.info("+ '%s' => '%s'", source, destination)
-					artifact_file.write(source, destination)
+					archive_file.write(source, destination)
 			shutil.move(artifact_path + ".zip.tmp", artifact_path + ".zip")
 
 
@@ -54,8 +54,8 @@ class ArtifactRepository:
 		logger.info("Reading '%s'", artifact_path + ".zip")
 
 		if not simulate:
-			with zipfile.ZipFile(artifact_path + ".zip", 'r') as artifact_file:
-				if artifact_file.testzip():
+			with zipfile.ZipFile(artifact_path + ".zip", 'r') as archive_file:
+				if archive_file.testzip():
 					raise RuntimeError('Artifact package is corrupted')
 
 
