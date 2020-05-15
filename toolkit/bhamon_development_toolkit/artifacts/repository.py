@@ -32,7 +32,7 @@ class ArtifactRepository:
 
 
 	def package(self, # pylint: disable = too-many-arguments
-			path_in_repository, artifact_name, artifact_files, compression = zipfile.ZIP_DEFLATED, compression_level = None, simulate = False):
+			path_in_repository, artifact_name, artifact_files, compression = zipfile.ZIP_DEFLATED, simulate = False):
 		logger.info("Packaging artifact '%s'", artifact_name)
 
 		if len(artifact_files) == 0:
@@ -49,7 +49,7 @@ class ArtifactRepository:
 			for source, destination in artifact_files:
 				logger.debug("+ '%s' => '%s'", source, destination)
 		else:
-			with zipfile.ZipFile(artifact_path + ".zip.tmp", mode = "w", compression = compression, compresslevel = compression_level) as archive_file:
+			with zipfile.ZipFile(artifact_path + ".zip.tmp", mode = "w", compression = compression) as archive_file:
 				for source, destination in artifact_files:
 					logger.debug("+ '%s' => '%s'", source, destination)
 					archive_file.write(source, destination)
