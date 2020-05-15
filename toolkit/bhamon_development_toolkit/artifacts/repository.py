@@ -24,7 +24,11 @@ class ArtifactRepository:
 
 
 	def list_remote(self, path_in_repository, artifact_pattern):
-		return self.server_client.get_list(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
+		return self.server_client.list_files(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
+
+
+	def list_remote_with_metadata(self, path_in_repository, artifact_pattern):
+		return self.server_client.list_files_with_metadata(self.project_identifier, path_in_repository, artifact_pattern, ".zip")
 
 
 	def package(self, path_in_repository, artifact_name, artifact_files, simulate):

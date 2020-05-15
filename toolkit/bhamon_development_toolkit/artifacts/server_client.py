@@ -1,3 +1,4 @@
+import datetime
 import glob
 import logging
 import os
@@ -40,10 +41,27 @@ class ArtifactServerFileClient:
 		return os.path.exists(remote_artifact_path + file_extension)
 
 
-	def get_list(self, repository, path_in_repository, artifact_pattern, file_extension):
+	def list_files(self, repository, path_in_repository, artifact_pattern, file_extension):
 		artifact_directory = os.path.join(self.server_path, repository, path_in_repository)
 		all_artifact_paths = glob.glob(os.path.join(artifact_directory, artifact_pattern + file_extension))
 		return [ os.path.basename(path[ : - len(file_extension) ]) for path in all_artifact_paths ]
+
+
+	def list_files_with_metadata(self, repository, path_in_repository, artifact_pattern, file_extension):
+		name_collection = self.list_files(repository, path_in_repository, artifact_pattern, file_extension)
+
+		file_entry_collection = []
+		for file_name in name_collection:
+			file_path = os.path.join(self.server_path, repository, path_in_repository, file_name + file_extension)
+			modification_date = datetime.datetime.utcfromtimestamp(os.path.getmtime(file_path)).replace(microsecond = 0).isoformat() + "Z"
+			file_entry = { "name": file_name, "update_date": modification_date }
+			file_entry_collection.append(file_entry)
+
+		return file_entry_collection
+
+
+	def list_directories(self, repository, directory_pattern):
+		return [ os.path.basename(path) for path in glob.glob(os.path.join(self.server_path, repository, directory_pattern)) if os.path.isdir(path) ]
 
 
 	def create_directory(self, repository, path_in_repository, simulate):
