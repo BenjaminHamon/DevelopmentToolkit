@@ -57,6 +57,7 @@ def load_commands():
 		"development.commands.clean",
 		"development.commands.develop",
 		"development.commands.distribute",
+		"development.commands.info",
 		"development.commands.lint",
 	]
 
