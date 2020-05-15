@@ -46,11 +46,11 @@ class ArtifactRepository:
 
 		if simulate:
 			for source, destination in artifact_files:
-				logger.info("+ '%s' => '%s'", source, destination)
+				logger.debug("+ '%s' => '%s'", source, destination)
 		else:
 			with zipfile.ZipFile(artifact_path + ".zip.tmp", "w", zipfile.ZIP_DEFLATED) as archive_file:
 				for source, destination in artifact_files:
-					logger.info("+ '%s' => '%s'", source, destination)
+					logger.debug("+ '%s' => '%s'", source, destination)
 					archive_file.write(source, destination)
 			shutil.move(artifact_path + ".zip.tmp", artifact_path + ".zip")
 
@@ -91,17 +91,17 @@ class ArtifactRepository:
 			artifact_files = artifact_file.namelist()
 			for source in artifact_files:
 				destination = os.path.join(extraction_directory, source).replace("\\", "/")
-				logger.info("+ '%s' => '%s'", source, destination)
+				logger.debug("+ '%s' => '%s'", source, destination)
 				if not simulate:
 					artifact_file.extract(source, extraction_directory)
 
 		print("")
 
-		logger.info("Moving files files to '%s'", installation_directory)
+		logger.info("Moving files to '%s'", installation_directory)
 		for file_path in artifact_files:
 			source = os.path.join(extraction_directory, file_path).replace("\\", "/")
 			destination = os.path.join(installation_directory, file_path).replace("\\", "/")
-			logger.info("+ '%s' => '%s'", source, destination)
+			logger.debug("+ '%s' => '%s'", source, destination)
 			if not simulate:
 				os.makedirs(os.path.dirname(destination), exist_ok = True)
 				shutil.move(source, destination)
