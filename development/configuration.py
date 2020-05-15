@@ -8,19 +8,8 @@ def load_configuration(environment):
 	configuration = {
 		"project": "bhamon-development-toolkit",
 		"project_name": "Development Toolkit",
-		"project_version": { "identifier": "1.0" },
+		"project_version": load_project_version(environment["git_executable"], "1.0"),
 	}
-
-	branch = subprocess.check_output([ environment["git_executable"], "rev-parse", "--abbrev-ref", "HEAD" ]).decode("utf-8").strip()
-	revision = subprocess.check_output([ environment["git_executable"], "rev-parse", "--short=10", "HEAD" ]).decode("utf-8").strip()
-	revision_date = int(subprocess.check_output([ environment["git_executable"], "show", "--no-patch", "--format=%ct", revision ]).decode("utf-8").strip())
-	revision_date = datetime.datetime.utcfromtimestamp(revision_date).replace(microsecond = 0).isoformat() + "Z"
-
-	configuration["project_version"]["branch"] = branch
-	configuration["project_version"]["revision"] = revision
-	configuration["project_version"]["date"] = revision_date
-	configuration["project_version"]["numeric"] = "{identifier}".format(**configuration["project_version"])
-	configuration["project_version"]["full"] = "{identifier}+{revision}".format(**configuration["project_version"])
 
 	configuration["author"] = "Benjamin Hamon"
 	configuration["author_email"] = "hamon.benjamin@gmail.com"
@@ -36,6 +25,22 @@ def load_configuration(environment):
 	configuration["artifact_directory"] = "artifacts"
 
 	return configuration
+
+
+def load_project_version(git_executable, identifier):
+	branch = subprocess.check_output([ git_executable, "rev-parse", "--abbrev-ref", "HEAD" ], universal_newlines = True).strip()
+	revision = subprocess.check_output([ git_executable, "rev-parse", "--short=10", "HEAD" ], universal_newlines = True).strip()
+	revision_date = int(subprocess.check_output([ git_executable, "show", "--no-patch", "--format=%ct", revision ], universal_newlines = True).strip())
+	revision_date = datetime.datetime.utcfromtimestamp(revision_date).replace(microsecond = 0).isoformat() + "Z"
+
+	return {
+		"identifier": identifier,
+		"numeric": identifier,
+		"full": identifier + "+" + revision,
+		"branch": branch,
+		"revision": revision,
+		"date": revision_date,
+	}
 
 
 def get_setuptools_parameters(configuration):
