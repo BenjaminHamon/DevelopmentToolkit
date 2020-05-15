@@ -33,6 +33,8 @@ def load_configuration(environment):
 		{ "name": "bhamon-development-toolkit", "path": "toolkit" },
 	]
 
+	configuration["artifact_directory"] = "artifacts"
+
 	return configuration
 
 

@@ -1,5 +1,5 @@
-# Build artifacts
-.artifacts/
+# Artifacts
+/artifacts/
 
 # Distribution
 /toolkit/build/
@@ -20,9 +20,6 @@ __pycache__/
 
 # Python virtual environment
 .venv/
-
-# Tests
-test_results/
 
 # Visual Studio Code
 .vscode/

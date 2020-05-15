@@ -17,22 +17,23 @@ def configure_argument_parser(environment, configuration, subparsers): # pylint:
 
 def run(environment, configuration, arguments): # pylint: disable = unused-argument
 	run_identifier = str(uuid.uuid4())
+	result_directory = os.path.join(configuration["artifact_directory"], "lint_results")
 	session_success = True
 
 	if not arguments.simulate:
-		if os.path.exists(os.path.join("test_results", run_identifier)):
-			shutil.rmtree(os.path.join("test_results", run_identifier))
-		os.makedirs(os.path.join("test_results", run_identifier))
+		if os.path.exists(os.path.join(result_directory, run_identifier)):
+			shutil.rmtree(os.path.join(result_directory, run_identifier))
+		os.makedirs(os.path.join(result_directory, run_identifier))
 
 	for component in configuration["components"]:
-		pylint_results = python_lint.run_pylint(environment["python3_executable"], "test_results", run_identifier, component["name"].replace("-", "_"), simulate = arguments.simulate)
+		pylint_results = python_lint.run_pylint(environment["python3_executable"], result_directory, run_identifier, component["name"].replace("-", "_"), simulate = arguments.simulate)
 		if not pylint_results["success"]:
 			session_success = False
 
 		print("")
 
 	if arguments.results:
-		save_results(arguments.results, "test_results", run_identifier, simulate = arguments.simulate)
+		save_results(arguments.results, result_directory, run_identifier, simulate = arguments.simulate)
 
 	if not session_success:
 		raise RuntimeError("Linting failed")
