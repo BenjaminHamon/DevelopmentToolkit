@@ -39,13 +39,13 @@ class PythonPackageRepositoryFileClient:
 		return next((x for x in glob.glob(os.path.join(self.server_path, distribution, distribution_pattern))), None)
 
 
-	def create_directory(self, distribution, simulate):
+	def create_directory(self, distribution, simulate = False):
 		directory_path = os.path.join(self.server_path, distribution)
 		if not simulate:
 			os.makedirs(directory_path, exist_ok = True)
 
 
-	def upload(self, local_directory, distribution, version, file_extension, simulate): # pylint: disable = too-many-arguments
+	def upload(self, local_directory, distribution, version, file_extension, simulate = False): # pylint: disable = too-many-arguments
 		logger.info("Uploading distribution '%s' to repository '%s'", distribution, self.server_path)
 
 		archive_name = distribution.replace("-", "_") + "-" + version["full"]
@@ -59,7 +59,7 @@ class PythonPackageRepositoryFileClient:
 		if existing_distribution is not None:
 			raise ValueError("Version %s already exists: '%s'" % (version["identifier"], os.path.basename(existing_distribution)))
 
-		self.create_directory(distribution, simulate)
+		self.create_directory(distribution, simulate = simulate)
 
 		logger.info("Copying '%s' to '%s'", source_path, destination_path)
 		if not simulate:
@@ -97,7 +97,7 @@ class PythonPackageRepositorySshClient:
 		return search_process.stdout.read().decode().splitlines()[0]
 
 
-	def create_directory(self, distribution, simulate):
+	def create_directory(self, distribution, simulate = False):
 		mkdir_command = [ self.ssh_executable ] + self.ssh_parameters + [ self.server_user + "@" + self.server_host ]
 		mkdir_command += [ "mkdir --parents %s" % (self.server_path + "/" + distribution) ]
 
@@ -110,7 +110,7 @@ class PythonPackageRepositorySshClient:
 				raise RuntimeError("Failed to create directory: '%s'" % distribution)
 
 
-	def upload(self, local_directory, distribution, version, file_extension, simulate): # pylint: disable = too-many-arguments
+	def upload(self, local_directory, distribution, version, file_extension, simulate = False): # pylint: disable = too-many-arguments
 		logger.info("Uploading distribution '%s' to repository '%s'", distribution, "ssh://" + self.server_host + ":" + self.server_path)
 
 		archive_name = distribution.replace("-", "_") + "-" + version["full"]
@@ -124,7 +124,7 @@ class PythonPackageRepositorySshClient:
 		if existing_distribution is not None:
 			raise ValueError("Version %s already exists: '%s'" % (version["identifier"], os.path.basename(existing_distribution)))
 
-		self.create_directory(distribution, simulate)
+		self.create_directory(distribution, simulate = simulate)
 
 		upload_command = [ self.scp_executable ] + self.ssh_parameters + [ source_path ]
 		upload_command += [ self.server_user + "@" + self.server_host + ":" + destination_path + ".tmp" ]

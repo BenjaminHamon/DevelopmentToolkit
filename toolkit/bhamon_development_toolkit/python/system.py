@@ -7,7 +7,7 @@ import subprocess
 logger = logging.getLogger("Python")
 
 
-def setup_virtual_environment(python_system_executable, target_directory, simulate):
+def setup_virtual_environment(python_system_executable, target_directory, simulate = False):
 	setup_venv_command = [ python_system_executable, "-m", "venv", target_directory ]
 	logger.info("+ %s", " ".join(setup_venv_command))
 	if not simulate:
@@ -23,7 +23,7 @@ def setup_virtual_environment(python_system_executable, target_directory, simula
 		subprocess.check_call(install_pip_command)
 
 
-def install_packages(python_executable, python_package_repository, package_collection, simulate):
+def install_packages(python_executable, python_package_repository, package_collection, simulate = False):
 	install_command = [ python_executable, "-m", "pip", "install", "--upgrade" ]
 	install_command += [ "--extra-index", python_package_repository ] if python_package_repository is not None else []
 

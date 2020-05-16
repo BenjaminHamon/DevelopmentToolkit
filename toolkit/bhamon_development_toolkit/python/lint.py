@@ -21,7 +21,7 @@ pylint_message_elements = [
 ]
 
 
-def run_pylint(python_executable, result_directory, run_identifier, target, simulate): # pylint: disable = too-many-locals
+def run_pylint(python_executable, result_directory, run_identifier, target, simulate = False): # pylint: disable = too-many-locals
 	logger.info("Running linter (RunIdentifier: '%s', Target: '%s')", run_identifier, target)
 
 	result_directory = os.path.join(result_directory, str(run_identifier))

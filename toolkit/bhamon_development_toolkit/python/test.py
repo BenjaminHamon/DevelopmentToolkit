@@ -11,7 +11,9 @@ logger = logging.getLogger("Test")
 pytest_status_collection = [ "error", "failed", "passed", "skipped", "xfailed", "xpassed" ]
 
 
-def run_pytest(python_executable, result_directory, run_identifier, target, filter_expression, simulate): # pylint: disable = too-many-arguments, too-many-locals
+def run_pytest( # pylint: disable = too-many-arguments, too-many-locals
+		python_executable, result_directory, run_identifier, target, filter_expression, simulate = False):
+
 	logger.info("Running test session (RunIdentifier: '%s', Target: '%s', Filter: '%s')", run_identifier, target, filter_expression)
 
 	result_directory = os.path.join(result_directory, str(run_identifier))
