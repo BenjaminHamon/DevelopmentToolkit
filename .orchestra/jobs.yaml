@@ -1,0 +1,49 @@
+- identifier: check
+  display_name: Check
+  description: Run checks.
+
+  definition:
+    type: job
+
+    setup_commands:
+    - [ "{environment[orchestra_worker_python_executable]}", "-u", "-m", "bhamon_orchestra_worker_scripts.development_toolkit",
+        "--configuration", "{environment[orchestra_worker_configuration]}", "--results", "{result_file_path}" ]
+
+    commands:
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "clean" ]
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "develop" ]
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "lint" ]
+
+  parameters:
+  - { key: revision, description: "Revision for the source repository" }
+
+  properties:
+    operating_system: [ "linux", "windows" ]
+    is_controller: False
+    include_in_status: True
+
+
+- identifier: distribute
+  display_name: Distribute
+  description: Generate and upload distribution packages.
+
+  definition:
+    type: job
+
+    setup_commands:
+    - [ "{environment[orchestra_worker_python_executable]}", "-u", "-m", "bhamon_orchestra_worker_scripts.development_toolkit",
+        "--configuration", "{environment[orchestra_worker_configuration]}", "--results", "{result_file_path}" ]
+
+    commands:
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "clean" ]
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "develop" ]
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "distribute", "package" ]
+    - [ ".venv/scripts/python", "-u", "development/main.py", "--verbosity", "debug", "--results", "{result_file_path}", "distribute", "upload" ]
+
+  parameters:
+  - { key: revision, description: "Revision for the source repository" }
+
+  properties:
+    operating_system: [ "linux", "windows" ]
+    is_controller: False
+    include_in_status: True
