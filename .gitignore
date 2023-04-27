@@ -1,15 +1,13 @@
 # Artifacts
-/artifacts/
+/Artifacts/
 
 # Distribution
-/toolkit/build/
-/toolkit/dist/
+/Sources/*/build/
+/Sources/*/dist/
+/Sources/*/*/__metadata__.py
 
 # Environment
-environment.json
-
-# Generated metadata
-__metadata__.py
+/environment.json
 
 # Logs
 *.log
