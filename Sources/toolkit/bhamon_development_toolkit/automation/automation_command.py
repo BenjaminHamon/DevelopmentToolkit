@@ -18,3 +18,8 @@ class AutomationCommand(abc.ABC):
     @abc.abstractmethod
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         pass
+
+
+    @abc.abstractmethod
+    async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
+        pass

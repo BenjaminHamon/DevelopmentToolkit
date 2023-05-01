@@ -19,3 +19,7 @@ class AutomationCommandGroup(AutomationCommand):
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         raise NotImplementedError("Run is not supported for a command group")
+
+
+    async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
+        raise NotImplementedError("Run is not supported for a command group")
