@@ -30,8 +30,10 @@ def main() -> None:
         logger.info("Setting up local workspace (Path: %s)", os.getcwd())
 
         python_system_executable = python_helpers.find_and_check_system_python_executable(python_versions)
+        venv_python_executable = python_helpers.get_venv_python_executable(venv_directory)
 
         python_helpers.setup_virtual_environment(python_system_executable, venv_directory, simulate = arguments.simulate)
+        python_helpers.install_python_packages(venv_python_executable, [ "Automation/Scripts[dev]" ], simulate = arguments.simulate)
 
 
 def parse_arguments() -> argparse.Namespace:

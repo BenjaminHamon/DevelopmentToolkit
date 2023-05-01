@@ -2,6 +2,8 @@
 /Artifacts/
 
 # Distribution
+/Automation/Scripts/build/
+/Automation/Scripts/dist/
 /Sources/*/build/
 /Sources/*/dist/
 /Sources/*/*/__metadata__.py
