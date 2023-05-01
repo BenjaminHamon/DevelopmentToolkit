@@ -33,7 +33,7 @@ def main() -> None:
         venv_python_executable = python_helpers.get_venv_python_executable(venv_directory)
 
         python_helpers.setup_virtual_environment(python_system_executable, venv_directory, simulate = arguments.simulate)
-        python_helpers.install_python_packages(venv_python_executable, [ "Automation/Scripts[dev]" ], simulate = arguments.simulate)
+        python_helpers.install_python_packages(venv_python_executable, [ "Automation/Scripts[dev]", "Sources/toolkit" ], simulate = arguments.simulate)
 
 
 def parse_arguments() -> argparse.Namespace:
