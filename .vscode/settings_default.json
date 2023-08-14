@@ -8,5 +8,5 @@
 	"python.linting.pylintArgs": [ "--rcfile", "${workspaceFolder}/pylintrc" ],
 
 	"python.testing.pytestEnabled": true,
-	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini" ],
+	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation", "Tests" ],
 }
