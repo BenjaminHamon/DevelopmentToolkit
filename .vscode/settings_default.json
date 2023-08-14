@@ -1,6 +1,7 @@
 {
 	"$schema": "./schema.json",
 
+	"python.analysis.extraPaths": [ "./Automation/Setup" ],
 	"python.analysis.typeCheckingMode": "basic",
 
 	"python.linting.pylintEnabled": true,
