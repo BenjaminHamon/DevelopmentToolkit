@@ -184,7 +184,7 @@ def _create_distribution_manager(python_executable: str, repository_url: str) ->
     credentials = credentials_provider.get_credentials(repository_url)
 
     python_distribution_manager = PythonTwineDistributionManager(python_executable)
-    python_distribution_manager.repository_url = repository_url
+    python_distribution_manager.repository_url = repository_url + "/"
     python_distribution_manager.username = credentials.username
     python_distribution_manager.password = credentials.secret
 
