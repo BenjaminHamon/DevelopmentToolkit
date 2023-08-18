@@ -37,7 +37,7 @@ class LintCommand(AutomationCommand):
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         project_configuration: ProjectConfiguration = kwargs["configuration"]
 
-        process_runner = ProcessRunner(ProcessSpawner())
+        process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         pylint_runner = PylintRunner(process_runner, sys.executable)
 
         all_python_scopes: List[PylintScope] = []

@@ -26,7 +26,7 @@ def event_loop():
 @pytest.mark.asyncio
 async def test_run_with_simulate(tmpdir):
     python_executable = "my-python"
-    process_runner = ProcessRunner(ProcessSpawner())
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
     pylint_runner = PylintRunner(process_runner, python_executable) # type: ignore
 
     all_scopes = [ PylintScope("All", "my-test-directory") ]
@@ -39,7 +39,7 @@ async def test_run_with_simulate(tmpdir):
 @pytest.mark.asyncio
 async def test_run_with_success(tmpdir):
     python_executable = sys.executable
-    process_runner = ProcessRunner(ProcessSpawner())
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
     pylint_runner = PylintRunner(process_runner, python_executable) # type: ignore
 
     source_directory = os.path.join(tmpdir, "Sources")
@@ -59,7 +59,7 @@ async def test_run_with_success(tmpdir):
 @pytest.mark.asyncio
 async def test_run_with_failure(tmpdir):
     python_executable = sys.executable
-    process_runner = ProcessRunner(ProcessSpawner())
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
     pylint_runner = PylintRunner(process_runner, python_executable) # type: ignore
 
     source_directory = os.path.join(tmpdir, "Sources")
@@ -80,7 +80,7 @@ async def test_run_with_failure(tmpdir):
 @pytest.mark.asyncio
 async def test_run_with_no_tests(tmpdir):
     python_executable = sys.executable
-    process_runner = ProcessRunner(ProcessSpawner())
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
     pylint_runner = PylintRunner(process_runner, python_executable) # type: ignore
 
     source_directory = os.path.join(tmpdir, "Sources")

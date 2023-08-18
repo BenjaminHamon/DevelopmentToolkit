@@ -37,7 +37,7 @@ class TestCommand(AutomationCommand):
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         project_configuration: ProjectConfiguration = kwargs["configuration"]
 
-        process_runner = ProcessRunner(ProcessSpawner())
+        process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         pytest_runner = PytestRunner(process_runner, sys.executable)
 
         all_python_scopes: List[PytestScope] = []
