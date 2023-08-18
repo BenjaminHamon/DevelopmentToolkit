@@ -47,7 +47,7 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
     logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
 
     venv_python_executable = get_venv_python_executable(venv_directory)
-    if sys.executable.lower() == venv_python_executable.lower():
+    if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
         raise RuntimeError("Active python is the target virtual environment")
 
     if os.path.isdir(venv_directory) and not simulate:
