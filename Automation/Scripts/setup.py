@@ -31,6 +31,7 @@ def run_setup() -> None:
                 "pylint ~= 2.17.3",
                 "pytest ~= 7.3.1",
                 "pytest-asyncio ~= 0.21.0",
+                "pytest-json ~= 0.4.0",
             ],
         },
     )
