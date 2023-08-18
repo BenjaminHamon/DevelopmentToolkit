@@ -28,9 +28,9 @@ def run_setup() -> None:
         extras_require = {
             "dev": [
                 "mockito ~= 1.4.0",
-                "pylint ~= 2.17.3",
-                "pytest ~= 7.3.1",
-                "pytest-asyncio ~= 0.21.0",
+                "pylint ~= 2.17.5",
+                "pytest ~= 7.4.0",
+                "pytest-asyncio ~= 0.21.1",
                 "pytest-json ~= 0.4.0",
             ],
         },
