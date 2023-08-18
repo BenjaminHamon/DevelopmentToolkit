@@ -52,6 +52,7 @@ def list_commands() -> List[str]:
         "automation_scripts.commands.clean.CleanCommand",
         "automation_scripts.commands.distribution.DistributionCommand",
         "automation_scripts.commands.info.InfoCommand",
+        "automation_scripts.commands.lint.LintCommand",
     ]
 
 
