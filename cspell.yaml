@@ -2,3 +2,7 @@ words:
 - bhamon
 - levelname
 - pyvenv
+- sigbreak
+- sigint
+- sigkill
+- sigterm
