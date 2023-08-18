@@ -87,7 +87,7 @@ class PythonPackageRepositorySshClient:
         search_command += [ "ls %s" % (self.server_path + "/" + distribution + "/" + distribution_pattern) ]
 
         logger.info("+ %s", " ".join(("'" + x + "'") if " " in x else x for x in search_command))
-        search_process = subprocess.Popen(search_command, stdout = subprocess.PIPE)
+        search_process = subprocess.Popen(search_command, stdout = subprocess.PIPE) # pylint: disable = consider-using-with
         search_process.wait()
 
         if search_process.returncode == 255:

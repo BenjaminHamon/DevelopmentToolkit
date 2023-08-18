@@ -69,11 +69,13 @@ class ArtifactRepository:
 
 
     def upload(self, path_in_repository, artifact_name, overwrite = False, simulate = False):
-        self.server_client.upload(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", overwrite = overwrite, simulate = simulate)
+        self.server_client.upload(
+            self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", overwrite = overwrite, simulate = simulate)
 
 
     def download(self, path_in_repository, artifact_name, simulate = False):
-        self.server_client.download(self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", simulate = simulate)
+        self.server_client.download(
+            self.local_path, self.project_identifier, path_in_repository, artifact_name, ".zip", simulate = simulate)
 
 
     def install(self, # pylint: disable = too-many-arguments

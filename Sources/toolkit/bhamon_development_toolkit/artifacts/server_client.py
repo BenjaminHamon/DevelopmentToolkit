@@ -80,7 +80,9 @@ class ArtifactServerFileClient:
 
     def upload(self, # pylint: disable = too-many-arguments
             local_repository, remote_repository, path_in_repository, artifact_name, file_extension, overwrite = False, simulate = False):
-        logger.info("Uploading artifact '%s' to repository '%s'", artifact_name, os.path.join(self.server_path, remote_repository))
+
+        logger.info("Uploading artifact '%s' to repository '%s'",
+            artifact_name, os.path.join(self.server_path, remote_repository))
 
         local_artifact_path = os.path.join(local_repository, path_in_repository, artifact_name)
         remote_artifact_path = os.path.join(self.server_path, remote_repository, path_in_repository, artifact_name)
@@ -100,7 +102,9 @@ class ArtifactServerFileClient:
 
     def download(self, # pylint: disable = too-many-arguments
             local_repository, remote_repository, path_in_repository, artifact_name, file_extension, simulate = False):
-        logger.info("Downloading artifact '%s' from repository '%s'", artifact_name, os.path.join(self.server_path, remote_repository))
+
+        logger.info("Downloading artifact '%s' from repository '%s'",
+            artifact_name, os.path.join(self.server_path, remote_repository))
 
         local_artifact_path = os.path.join(local_repository, path_in_repository, artifact_name)
         remote_artifact_path = os.path.join(self.server_path, remote_repository, path_in_repository, artifact_name)
@@ -180,7 +184,9 @@ class ArtifactServerSshClient:
 
     def upload(self, # pylint: disable = too-many-arguments
             local_repository, remote_repository, path_in_repository, artifact_name, file_extension, overwrite = False, simulate = False):
-        logger.info("Uploading artifact '%s' to repository '%s'", artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)
+
+        logger.info("Uploading artifact '%s' to repository '%s'",
+            artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)
 
         local_artifact_path = os.path.join(local_repository, path_in_repository, artifact_name)
         remote_artifact_path = self.server_path + "/" + remote_repository + "/" + path_in_repository + "/" + artifact_name
@@ -218,7 +224,9 @@ class ArtifactServerSshClient:
 
     def download(self, # pylint: disable = too-many-arguments
             local_repository, remote_repository, path_in_repository, artifact_name, file_extension, simulate = False):
-        logger.info("Downloading artifact '%s' from repository '%s'", artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)
+
+        logger.info("Downloading artifact '%s' from repository '%s'",
+            artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)
 
         local_artifact_path = os.path.join(local_repository, path_in_repository, artifact_name)
         remote_artifact_path = self.server_path + "/" + remote_repository + "/" + path_in_repository + "/" + artifact_name
