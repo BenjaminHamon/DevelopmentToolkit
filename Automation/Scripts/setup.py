@@ -32,6 +32,7 @@ def run_setup() -> None:
                 "pytest ~= 7.4.0",
                 "pytest-asyncio ~= 0.21.1",
                 "pytest-json ~= 0.4.0",
+                "twine ~= 4.0.2",
             ],
         },
     )
