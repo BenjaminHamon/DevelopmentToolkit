@@ -48,6 +48,9 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
         raise RuntimeError("Active python is the target virtual environment")
 
     if os.path.isdir(venv_directory) and not simulate:
+        # Try to remove the executable first since it might be in use, otherwise we would be leaving a broken venv
+        if platform.system() == "Windows" and os.path.exists(os.path.join(venv_directory, "scripts", "python.exe")):
+            os.remove(os.path.join(venv_directory, "scripts", "python.exe"))
         shutil.rmtree(venv_directory)
 
     run_python_command([ python_system_executable, "-m", "venv", venv_directory ], simulate = simulate)
