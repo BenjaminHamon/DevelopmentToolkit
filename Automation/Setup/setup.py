@@ -10,7 +10,7 @@ import python_helpers
 logger = logging.getLogger("Main")
 
 
-python_versions = [ "3.7", "3.8", "3.9" ]
+python_versions = [ "3.9", "3.10", "3.11" ]
 venv_directory = ".venv"
 
 

@@ -22,7 +22,7 @@ def run_setup() -> None:
         author_email = project_configuration["AuthorEmail"],
         url = project_configuration["ProjectUrl"],
         packages = setuptools.find_packages(include = [ "bhamon_development_toolkit", "bhamon_development_toolkit.*" ]),
-        python_requires = "~= 3.7",
+        python_requires = "~= 3.9",
     )
 
 

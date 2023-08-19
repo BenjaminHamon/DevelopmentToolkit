@@ -23,7 +23,7 @@ def run_setup() -> None:
         url = project_configuration["ProjectUrl"],
         packages = setuptools.find_packages(include = [ "automation_scripts", "automation_scripts.*" ]),
 
-        python_requires = "~= 3.7",
+        python_requires = "~= 3.9",
 
         extras_require = {
             "dev": [
