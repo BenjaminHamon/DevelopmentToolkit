@@ -1,15 +1,15 @@
 # Artifacts
-/artifacts/
+/Artifacts/
 
 # Distribution
-/toolkit/build/
-/toolkit/dist/
+/Automation/Scripts/build/
+/Automation/Scripts/dist/
+/Sources/*/build/
+/Sources/*/dist/
+/Sources/*/*/__metadata__.py
 
 # Environment
-environment.json
-
-# Generated metadata
-__metadata__.py
+/environment.json
 
 # Logs
 *.log
@@ -22,4 +22,4 @@ __pycache__/
 .venv/
 
 # Visual Studio Code
-.vscode/
+/.vscode/settings.json
