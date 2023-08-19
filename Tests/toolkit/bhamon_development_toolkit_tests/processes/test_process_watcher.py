@@ -2,7 +2,6 @@
 
 import asyncio
 import datetime
-from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 
 import pytest
 
@@ -10,6 +9,7 @@ from bhamon_development_toolkit.processes.exceptions.process_failure_exception i
 from bhamon_development_toolkit.processes.exceptions.process_timeout_exception import ProcessTimeoutException
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_watcher import ProcessWatcher
 
 from .fake_process import FakeProcess
