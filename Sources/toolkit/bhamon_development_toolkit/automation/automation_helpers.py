@@ -1,3 +1,5 @@
+# cspell:words levelname
+
 import argparse
 import contextlib
 import importlib

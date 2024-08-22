@@ -1,3 +1,5 @@
+# cspell:words xfailed xpassed
+
 import logging
 import os
 import re

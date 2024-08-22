@@ -1,3 +1,5 @@
+# cspell:words creationflags pythonioencoding
+
 import asyncio
 import logging
 import os

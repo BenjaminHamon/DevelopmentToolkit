@@ -1,3 +1,5 @@
+# cspell:words sigbreak
+
 import asyncio
 import platform
 import signal
