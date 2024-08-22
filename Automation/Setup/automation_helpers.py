@@ -1,3 +1,5 @@
+# cspell:words levelname
+
 import contextlib
 import json
 import logging
