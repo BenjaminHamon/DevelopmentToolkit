@@ -173,7 +173,7 @@ class ProcessWatcher: # pylint: disable = too-many-instance-attributes
                 break
 
             self._last_output_time = time.time()
-            line = line_as_bytes.decode(self._options.encoding)
+            line = line_as_bytes.decode(self._options.encoding).replace("\r\n", "\n")
 
             for handler in self._output_handlers:
                 handler.process_stdout_line(line)
@@ -188,7 +188,7 @@ class ProcessWatcher: # pylint: disable = too-many-instance-attributes
                 break
 
             self._last_output_time = time.time()
-            line = line_as_bytes.decode(self._options.encoding)
+            line = line_as_bytes.decode(self._options.encoding).replace("\r\n", "\n")
 
             for handler in self._output_handlers:
                 handler.process_stderr_line(line)

@@ -39,7 +39,7 @@ class ProcessSpawner:
 
         try:
             process = await asyncio.create_subprocess_exec(*command.get_command(),
-                stdin = subprocess.DEVNULL, stdout = subprocess.PIPE, stderr = subprocess.STDOUT,
+                stdin = subprocess.DEVNULL, stdout = subprocess.PIPE, stderr = subprocess.PIPE,
                 cwd = options.working_directory, env = process_environment, creationflags = self.subprocess_flags)
 
         except FileNotFoundError as exception:

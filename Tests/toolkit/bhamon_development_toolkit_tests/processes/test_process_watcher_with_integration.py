@@ -11,6 +11,7 @@ from bhamon_development_toolkit.processes.exceptions.process_failure_exception i
 from bhamon_development_toolkit.processes.exceptions.process_timeout_exception import ProcessTimeoutException
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 
 
@@ -131,47 +132,119 @@ async def test_run_timeout():
     assert status.exit_code == get_expected_termination_exit_code()
 
 
-# @pytest.mark.asyncio
-# async def test_output_timeout():
-#     termination_exit_code = - signal.SIGTERM
-#     if platform.system() == "Windows":
-#         termination_exit_code = 0xC000013A # STATUS_CONTROL_C_EXIT
+@pytest.mark.asyncio
+async def test_output_timeout():
+    spawner = ProcessSpawner(is_console = True)
+    command = ExecutableCommand("python")
+    command.add_arguments([ "-c", "import time; print('before'); time.sleep(10); print('after')" ])
 
-#     process_watcher_instance = ProcessWatcher(is_console = True)
-#     process_watcher_instance.output_timeout = 1
+    options = ProcessOptions(
+        output_timeout = datetime.timedelta(seconds = 0.5),
+        wait_update_interval = datetime.timedelta(seconds = 0.1))
 
-#     await process_watcher_instance.start([ "python", "-c", "import time; time.sleep(10)" ])
+    watcher = await spawner.spawn_process(command, options)
 
-#     assert process_watcher_instance.process is not None
-#     assert process_watcher_instance.process.returncode is None
-#     assert process_watcher_instance.is_running()
+    await watcher.start()
 
-#     await asyncio.wait_for(process_watcher_instance.wait(), timeout = process_watcher_instance.output_timeout + 1)
+    status = watcher.get_status()
+    assert status.pid > 0
+    assert status.is_running
+    assert status.exit_code is None
 
-#     assert process_watcher_instance.process is not None
-#     assert process_watcher_instance.process.returncode == termination_exit_code
-#     assert not process_watcher_instance.is_running()
+    if options.output_timeout is None:
+        raise RuntimeError("Output timeout should not be none")
+
+    await asyncio.wait_for(watcher.wait(), timeout = (options.output_timeout + datetime.timedelta(seconds = 0.5)).total_seconds())
+
+    with pytest.raises(ProcessTimeoutException) as exception:
+        await watcher.complete()
+    assert exception.value.exit_code == get_expected_termination_exit_code()
+
+    status = watcher.get_status()
+    assert status.pid > 0
+    assert not status.is_running
+    assert status.exit_code == get_expected_termination_exit_code()
 
 
-# @pytest.mark.asyncio
-# async def test_output():
+@pytest.mark.asyncio
+async def test_output():
+    spawner = ProcessSpawner(is_console = True)
+    command = ExecutableCommand("python")
+    command.add_arguments([ "-c", "print('hello')" ])
 
-#     process_watcher_instance = ProcessWatcher(is_console = True)
-#     stream = process_watcher_instance.add_stream_reader()
+    options = ProcessOptions(
+        wait_update_interval = datetime.timedelta(seconds = 0.1))
 
-#     await process_watcher_instance.run([ "python", "-c", "print('hello')" ])
+    watcher = await spawner.spawn_process(command = command, options = options)
 
-#     output = (await stream.read()).decode("utf-8").rstrip()
-#     assert output == "hello"
+    output_collector = ProcessOutputCollector()
+    watcher.add_output_handler(output_collector)
+
+    await watcher.start()
+    await watcher.wait()
+    await watcher.complete()
+
+    status = watcher.get_status()
+
+    assert status.pid > 0
+    assert not status.is_running
+    assert status.exit_code == 0
+
+    assert output_collector.get_stdout() == "hello\n"
+    assert output_collector.get_stderr() == ""
 
 
-# @pytest.mark.asyncio
-# async def test_output_unicode():
+@pytest.mark.asyncio
+async def test_output_stderr():
+    spawner = ProcessSpawner(is_console = True)
+    command = ExecutableCommand("python")
+    command.add_arguments([ "-c", "import sys; print('hello stderr', file = sys.stderr)" ])
 
-#     process_watcher_instance = ProcessWatcher(is_console = True)
-#     stream = process_watcher_instance.add_stream_reader()
+    options = ProcessOptions(
+        wait_update_interval = datetime.timedelta(seconds = 0.1))
 
-#     await process_watcher_instance.run([ "python", "-c", "print('… é ² √ 👍')" ])
+    watcher = await spawner.spawn_process(command = command, options = options)
 
-#     output = (await stream.read()).decode("utf-8").rstrip()
-#     assert output == "… é ² √ 👍"
+    output_collector = ProcessOutputCollector()
+    watcher.add_output_handler(output_collector)
+
+    await watcher.start()
+    await watcher.wait()
+    await watcher.complete()
+
+    status = watcher.get_status()
+
+    assert status.pid > 0
+    assert not status.is_running
+    assert status.exit_code == 0
+
+    assert output_collector.get_stdout() == ""
+    assert output_collector.get_stderr() == "hello stderr\n"
+
+
+@pytest.mark.asyncio
+async def test_output_unicode():
+    spawner = ProcessSpawner(is_console = True)
+    command = ExecutableCommand("python")
+    command.add_arguments([ "-c", "print('… é ² √ 👍')" ])
+
+    options = ProcessOptions(
+        wait_update_interval = datetime.timedelta(seconds = 0.1))
+
+    watcher = await spawner.spawn_process(command = command, options = options)
+
+    output_collector = ProcessOutputCollector()
+    watcher.add_output_handler(output_collector)
+
+    await watcher.start()
+    await watcher.wait()
+    await watcher.complete()
+
+    status = watcher.get_status()
+
+    assert status.pid > 0
+    assert not status.is_running
+    assert status.exit_code == 0
+
+    assert output_collector.get_stdout() == "… é ² √ 👍\n"
+    assert output_collector.get_stderr() == ""

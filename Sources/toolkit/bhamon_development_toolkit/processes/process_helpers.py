@@ -5,9 +5,10 @@ from typing import List, Optional, TextIO
 
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
+from bhamon_development_toolkit.processes.process_result import ProcessResult
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
-from bhamon_development_toolkit.processes.process_status import ProcessStatus
 
 
 def format_executable_command(command: List[str]):
@@ -46,8 +47,8 @@ async def run(
         command: ExecutableCommand,
         options: ProcessOptions,
         output_handlers: Optional[List[ProcessOutputHandler]] = None,
-        check_exit_code: bool = True
-        ) -> ProcessStatus:
+        check_exit_code: bool = True,
+    ) -> ProcessResult:
 
     watcher = await spawner.spawn_process(command = command, options = options)
 
@@ -66,4 +67,30 @@ async def run(
 
         raise
 
-    return watcher.get_status()
+    status = watcher.get_status()
+    if status.exit_code is None:
+        raise ValueError("Process exit code is not set")
+
+    return ProcessResult(
+        executable = status.executable,
+        exit_code = status.exit_code,
+    )
+
+
+async def run_with_collector(
+        spawner: ProcessSpawner,
+        command: ExecutableCommand,
+        options: ProcessOptions,
+        check_exit_code: bool = True,
+    ) -> ProcessResult:
+
+    output_collector = ProcessOutputCollector()
+
+    result = await run(spawner, command, options, output_handlers = [ output_collector ], check_exit_code = check_exit_code)
+
+    return ProcessResult(
+        executable = result.executable,
+        exit_code = result.exit_code,
+        standard_output = output_collector.get_stdout(),
+        error_output = output_collector.get_stderr(),
+    )
