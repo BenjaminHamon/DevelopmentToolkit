@@ -5,6 +5,7 @@ from typing import List, Optional, TextIO
 
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
 from bhamon_development_toolkit.processes.process_result import ProcessResult
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
@@ -73,4 +74,23 @@ async def run(
     return ProcessResult(
         executable = status.executable,
         exit_code = status.exit_code,
+    )
+
+
+async def run_with_collector(
+        spawner: ProcessSpawner,
+        command: ExecutableCommand,
+        options: ProcessOptions,
+        check_exit_code: bool = True,
+    ) -> ProcessResult:
+
+    output_collector = ProcessOutputCollector()
+
+    result = await run(spawner, command, options, output_handlers = [ output_collector ], check_exit_code = check_exit_code)
+
+    return ProcessResult(
+        executable = result.executable,
+        exit_code = result.exit_code,
+        standard_output = output_collector.get_stdout(),
+        error_output = output_collector.get_stderr(),
     )
