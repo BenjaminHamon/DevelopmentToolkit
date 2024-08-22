@@ -1,11 +1,12 @@
 {
 	"$schema": "./schema.json",
 
+	"isort.args": [ "--settings-file", ".isort.cfg" ],
+
+	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
+
 	"python.analysis.extraPaths": [ "./Automation/Setup" ],
 	"python.analysis.typeCheckingMode": "basic",
-
-	"python.linting.pylintEnabled": true,
-	"python.linting.pylintArgs": [ "--rcfile", "${workspaceFolder}/pylintrc" ],
 
 	"python.testing.pytestEnabled": true,
 	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation", "Tests" ],
