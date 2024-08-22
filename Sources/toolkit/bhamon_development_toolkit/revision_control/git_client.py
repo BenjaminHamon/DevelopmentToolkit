@@ -1,9 +1,11 @@
 import datetime
 import logging
-import os
 import subprocess
 from typing import Optional
 
+from bhamon_development_toolkit.processes.exceptions.process_failure_exception import ProcessFailureException
+from bhamon_development_toolkit.processes.process_result import ProcessResult
+from bhamon_development_toolkit.revision_control.git_direct_client import GitDirectClient
 from bhamon_development_toolkit.revision_control.revision_control_client import RevisionControlClient
 
 
@@ -13,11 +15,8 @@ logger = logging.getLogger("Git")
 class GitClient(RevisionControlClient):
 
 
-    def __init__(self, git_executable: Optional[str] = None, working_directory: Optional[str] = None) -> None:
-        self._git_executable = git_executable if git_executable is not None else "git"
-
-        self.working_directory = working_directory if working_directory is not None else os.getcwd()
-        self.encoding = "utf-8"
+    def __init__(self, git_direct_client: GitDirectClient) -> None:
+        self._direct_client = git_direct_client
 
 
     def get_current_revision(self) -> str:
@@ -25,13 +24,16 @@ class GitClient(RevisionControlClient):
 
 
     def get_current_branch(self) -> Optional[str]:
-        git_command = [ self._git_executable, "branch", "--show-current" ]
+        result = self._direct_client.branch(show_current = True)
 
-        git_command_result = subprocess.run(git_command,
-            check = True, capture_output = True, text = True, encoding = self.encoding, cwd = self.working_directory)
+        if result != 0:
+            self.raise_git_exception(result)
 
-        branch = git_command_result.stdout.strip()
-        return branch if not branch.isspace() else None
+        if result.standard_output is None:
+            return None
+        if result.standard_output.isspace():
+            return None
+        return result.standard_output.strip()
 
 
     def try_resolve_revision(self, reference: str) -> Optional[str]:
@@ -42,12 +44,14 @@ class GitClient(RevisionControlClient):
 
 
     def resolve_revision(self, reference: str) -> str:
-        git_command = [ self._git_executable, "rev-list", "--max-count", "1", reference ]
+        result = self._direct_client.rev_list(commits = [ reference ], max_count = 1)
 
-        git_command_result = subprocess.run(git_command,
-            check = True, capture_output = True, text = True, encoding = self.encoding, cwd = self.working_directory)
+        if result != 0:
+            self.raise_git_exception(result)
 
-        return git_command_result.stdout.strip()
+        if result.standard_output is None:
+            return ""
+        return result.standard_output.strip()
 
 
     def get_revision_date(self, revision: str) -> datetime.datetime:
@@ -81,10 +85,18 @@ class GitClient(RevisionControlClient):
 
             raise ValueError("Unsupported property: '%s'" % property_name)
 
-        git_command = [ self._git_executable, "show", "--no-patch" ]
-        git_command += [ "--format=%" + convert_property_to_format(property_name), revision ]
+        result = self._direct_client.show(objects = [ revision ], _format = "%" + convert_property_to_format(property_name))
 
-        git_command_result = subprocess.run(git_command,
-            check = True, capture_output = True, text = True, encoding = self.encoding, cwd = self.working_directory)
+        if result != 0:
+            self.raise_git_exception(result)
 
-        return git_command_result.stdout.strip()
+        if result.standard_output is None:
+            return ""
+        return result.standard_output.strip()
+
+
+    def raise_git_exception(self, result: ProcessResult) -> None:
+        exception_message = "Git command failed with exit code '%s'" % result.exit_code
+        if result.error_output:
+            exception_message += "\n" + result.error_output
+        raise ProcessFailureException(exception_message, result.executable, result.exit_code)
