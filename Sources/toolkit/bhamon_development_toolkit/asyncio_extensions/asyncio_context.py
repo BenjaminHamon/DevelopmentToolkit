@@ -18,9 +18,6 @@ class AsyncioContext:
     def run(self, coroutine: Any) -> None:
         system = platform.system()
 
-        if system == "Windows":
-            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy()) # pylint: disable = no-member
-
         old_signal_handlers: List[Tuple[signal.Signals,signal._HANDLER]] = [] # pylint: disable = no-member
 
         if system == "Windows":
