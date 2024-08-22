@@ -1,8 +1,6 @@
 """ Integration tests for PylintRunner """
 
-import asyncio
 import os
-import platform
 import sys
 
 import pytest
@@ -11,16 +9,6 @@ from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 from bhamon_development_toolkit.python.pylint_runner import PylintRunner
 from bhamon_development_toolkit.python.pylint_scope import PylintScope
-
-
-@pytest.fixture
-def event_loop():
-    if platform.system() == "Windows":
-        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy()) # pylint: disable = no-member
-
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.mark.asyncio

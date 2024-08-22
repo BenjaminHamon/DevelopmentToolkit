@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 import platform
@@ -55,8 +56,21 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
 
     run_python_command([ python_system_executable, "-m", "venv", venv_directory ], simulate = simulate)
 
-    if platform.system() in [ "Darwin", "Linux" ] and not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
-        os.symlink("bin", os.path.join(venv_directory, "scripts"))
+    if platform.system() == "Darwin": # pylint: disable = no-else-raise
+        raise NotImplementedError("MacOS is not supported")
+
+    elif platform.system() == "Linux":
+        if not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
+            os.symlink("bin", os.path.join(venv_directory, "scripts"))
+        if os.path.exists("pip.conf") and not simulate:
+            shutil.copy("pip.conf", os.path.join(".venv", "pip.conf"))
+
+    elif platform.system() == "Windows":
+        if os.path.exists("pip.conf") and not simulate:
+            shutil.copy("pip.conf", os.path.join(".venv", "pip.ini"))
+
+    else:
+        raise NotImplementedError("Unsupported system: '%s'" % platform.system())
 
     install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
 
@@ -65,6 +79,14 @@ def get_venv_python_executable(venv_directory: str) -> str:
     if platform.system() == "Windows":
         return os.path.join(venv_directory, "scripts", "python.exe")
     return os.path.join(venv_directory, "bin", "python")
+
+
+def list_python_packages(source_directory: str) -> List[str]:
+    package_collection: List[str] = []
+    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "setup.py")):
+        package_collection.append(os.path.dirname(setup_file_path))
+
+    return package_collection
 
 
 def install_python_packages(python_executable: str,

@@ -1,9 +1,15 @@
+---
+
+# cspell:words pycache venv
+
+ignorePaths:
+  - ".venv/**"
+  - "**/__pycache__/**"
+  - "**/*.egg-info/**"
+  - "Artifacts/**"
+  - "Sources/*/build/**"
+
 words:
-- basetemp
-- bhamon
-- levelname
-- pyvenv
-- sigbreak
-- sigint
-- sigkill
-- sigterm
+  - benjaminhamon
+  - bhamon
+  - hamon

@@ -1,3 +1,5 @@
+# cspell:words fileset filesets
+
 import copy
 import filecmp
 import glob

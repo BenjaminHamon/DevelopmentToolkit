@@ -1,8 +1,8 @@
 {
 	"ProjectIdentifier": "bhamon-development-toolkit",
 	"ProjectDisplayName": "Development Toolkit",
-	"ProjectVersionIdentifier": "2.0.0",
-	"Copyright": "Copyright (c) 2023 Benjamin Hamon",
+	"ProjectVersionIdentifier": "3.0.0",
+	"Copyright": "Copyright (c) 2024 Benjamin Hamon",
 	"Author": "Benjamin Hamon",
 	"AuthorEmail": "development@benjaminhamon.com",
 	"ProjectUrl": "https://github.com/BenjaminHamon/DevelopmentToolkit"

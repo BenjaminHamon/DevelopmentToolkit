@@ -1,3 +1,5 @@
+# cspell:words basetemp
+
 import json
 import logging
 import os

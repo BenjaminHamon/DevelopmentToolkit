@@ -14,16 +14,6 @@ from bhamon_development_toolkit.processes.process_options import ProcessOptions
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 
 
-@pytest.fixture
-def event_loop():
-    if platform.system() == "Windows":
-        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy()) # pylint: disable = no-member
-
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 def get_expected_termination_exit_code() -> int:
     if platform.system() == "Windows":
         return 0xC000013A # STATUS_CONTROL_C_EXIT
