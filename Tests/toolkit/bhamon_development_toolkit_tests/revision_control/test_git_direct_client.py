@@ -3,17 +3,20 @@ import re
 
 import pytest
 
+from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 from bhamon_development_toolkit.revision_control.git_direct_client import GitDirectClient
 
 
-def test_branch_with_show_current(tmpdir):
+@pytest.mark.asyncio
+async def test_branch_with_show_current(tmpdir):
     working_directory = os.path.join(str(tmpdir), "Workspace")
-    git_client = GitDirectClient(working_directory = working_directory)
+    process_spawner = ProcessSpawner(is_console = True)
+    git_client = GitDirectClient(process_spawner, working_directory = working_directory)
 
     os.makedirs(working_directory)
-    git_client.init()
+    await git_client.init()
 
-    result = git_client.branch(show_current = True)
+    result = await git_client.branch(show_current = True)
 
     assert result.exit_code == 0
     assert result.standard_output is not None
@@ -22,17 +25,19 @@ def test_branch_with_show_current(tmpdir):
     assert result.error_output == ""
 
 
-def test_commit(tmpdir):
+@pytest.mark.asyncio
+async def test_commit(tmpdir):
     working_directory = os.path.join(str(tmpdir), "Workspace")
-    git_client = GitDirectClient(working_directory = working_directory)
+    process_spawner = ProcessSpawner(is_console = True)
+    git_client = GitDirectClient(process_spawner, working_directory = working_directory)
     git_client.configuration_options["user.name"] = "Some Author"
     git_client.configuration_options["user.email"] = "some.author@example.com"
 
     os.makedirs(working_directory)
-    git_client.init()
+    await git_client.init()
 
     commit_message = "test_commit"
-    result = git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
+    result = await git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
 
     assert result.exit_code == 0
     assert result.standard_output is not None
@@ -41,19 +46,21 @@ def test_commit(tmpdir):
     assert result.error_output == ""
 
 
-def test_init(tmpdir):
+@pytest.mark.asyncio
+async def test_init(tmpdir):
     working_directory = os.path.join(str(tmpdir), "Workspace")
-    git_client = GitDirectClient(working_directory = working_directory)
+    process_spawner = ProcessSpawner(is_console = True)
+    git_client = GitDirectClient(process_spawner, working_directory = working_directory)
 
     assert not os.path.exists(os.path.join(working_directory, ".git"))
 
     with pytest.raises(NotADirectoryError):
-        git_client.init()
+        await git_client.init()
 
     assert not os.path.exists(os.path.join(working_directory, ".git"))
 
     os.makedirs(working_directory)
-    result = git_client.init()
+    result = await git_client.init()
 
     assert result.exit_code == 0
     assert result.standard_output is not None
@@ -64,16 +71,18 @@ def test_init(tmpdir):
     assert os.path.exists(os.path.join(working_directory, ".git"))
 
 
-def test_rev_list(tmpdir):
+@pytest.mark.asyncio
+async def test_rev_list(tmpdir):
     working_directory = os.path.join(str(tmpdir), "Workspace")
-    git_client = GitDirectClient(working_directory = working_directory)
+    process_spawner = ProcessSpawner(is_console = True)
+    git_client = GitDirectClient(process_spawner, working_directory = working_directory)
     git_client.configuration_options["user.name"] = "Some Author"
     git_client.configuration_options["user.email"] = "some.author@example.com"
 
     os.makedirs(working_directory)
-    git_client.init()
+    await git_client.init()
 
-    result = git_client.rev_list([ "HEAD" ])
+    result = await git_client.rev_list([ "HEAD" ])
 
     assert result.exit_code == 128
     assert result.standard_output == ""
@@ -82,9 +91,9 @@ def test_rev_list(tmpdir):
     assert result.error_output.splitlines()[0] == "fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree."
 
     commit_message = "test_rev_list"
-    git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
+    await git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
 
-    result = git_client.rev_list([ "HEAD" ])
+    result = await git_client.rev_list([ "HEAD" ])
 
     assert result.exit_code == 0
     assert result.standard_output is not None
@@ -93,19 +102,21 @@ def test_rev_list(tmpdir):
     assert result.error_output == ""
 
 
-def test_show(tmpdir):
+@pytest.mark.asyncio
+async def test_show(tmpdir):
     working_directory = os.path.join(str(tmpdir), "Workspace")
-    git_client = GitDirectClient(working_directory = working_directory)
+    process_spawner = ProcessSpawner(is_console = True)
+    git_client = GitDirectClient(process_spawner, working_directory = working_directory)
     git_client.configuration_options["user.name"] = "Some Author"
     git_client.configuration_options["user.email"] = "some.author@example.com"
 
     os.makedirs(working_directory)
-    git_client.init()
+    await git_client.init()
 
     commit_message = "test_show"
-    git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
+    await git_client.commit(message = commit_message, allow_empty = True, no_edit = True)
 
-    result = git_client.show([ "HEAD" ], _format = "%an", no_patch = True)
+    result = await git_client.show([ "HEAD" ], _format = "%an", no_patch = True)
 
     assert result.exit_code == 0
     assert result.standard_output is not None
