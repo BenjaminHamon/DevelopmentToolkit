@@ -16,7 +16,7 @@ def format_executable_command(command: List[str]):
 
 
 def format_executable_command_element(element: str) -> str:
-    return shlex.quote(element)
+    return shlex.quote(element) # FIXME: The shlex module is only designed for Unix shells.
 
 
 def create_raw_logger(stream: Optional[TextIO] = None, log_file_path: Optional[str] = None) -> logging.Logger:
