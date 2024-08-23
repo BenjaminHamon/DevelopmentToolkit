@@ -25,12 +25,13 @@ class PythonPackageBuilder:
         self._process_runner = process_runner
 
 
-    def generate_package_metadata(self,
-            project_version: ProjectVersion, copyright_text: str, python_package: PythonPackage, simulate: bool = False) -> None:
+    def generate_package_metadata(self, # pylint: disable = too-many-arguments
+            product_identifier: str, project_version: ProjectVersion, copyright_text: str, python_package: PythonPackage, simulate: bool = False) -> None:
 
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
 
         metadata_content = ""
+        metadata_content += "__product__ = \"%s\"\n" % product_identifier
         metadata_content += "__version__ = \"%s\"\n" % project_version.full_identifier
         metadata_content += "__date__ = \"%s\"\n" % (project_version.revision_date.replace(tzinfo = None).isoformat() + "Z")
         metadata_content += "__copyright__ = \"%s\"\n" % copyright_text

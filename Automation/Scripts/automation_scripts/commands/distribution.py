@@ -62,7 +62,11 @@ class _SetupCommand(AutomationCommand):
         logger.info("Generating python package metadata")
         for python_package in all_python_packages:
             python_package_builder.generate_package_metadata(
-                project_configuration.project_version, project_configuration.copyright, python_package, simulate = simulate)
+                product_identifier = project_configuration.project_identifier,
+                project_version = project_configuration.project_version,
+                copyright_text = project_configuration.copyright,
+                python_package = python_package,
+                simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
