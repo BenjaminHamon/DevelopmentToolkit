@@ -17,6 +17,7 @@
 # Python
 __pycache__/
 *.egg-info/
+*.pyc
 
 # Python virtual environment
 .venv/

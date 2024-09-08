@@ -13,3 +13,6 @@ words:
   - benjaminhamon
   - bhamon
   - hamon
+
+enableFiletypes:
+  - toml
