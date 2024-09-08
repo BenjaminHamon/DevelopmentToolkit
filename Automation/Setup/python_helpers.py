@@ -41,7 +41,7 @@ def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
     raise ValueError("Unsupported platform: '%s'" % platform.system())
 
 
-def setup_virtual_environment(python_system_executable: str, venv_directory: str, simulate: bool) -> None:
+def setup_virtual_environment(system_python_executable: str, venv_directory: str, simulate: bool) -> None:
     logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
 
     venv_python_executable = get_venv_python_executable(venv_directory)
@@ -54,7 +54,7 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
             os.remove(os.path.join(venv_directory, "scripts", "python.exe"))
         shutil.rmtree(venv_directory)
 
-    run_python_command([ python_system_executable, "-m", "venv", venv_directory ], simulate = simulate)
+    run_python_command([ system_python_executable, "-m", "venv", venv_directory ], simulate = simulate)
 
     if platform.system() == "Darwin": # pylint: disable = no-else-raise
         raise NotImplementedError("MacOS is not supported")

@@ -13,6 +13,12 @@ from bhamon_development_toolkit.processes.executable_command import ExecutableCo
 logger = logging.getLogger("Python")
 
 
+def resolve_system_python_executable() -> str:
+    if hasattr(sys, "_base_executable"):
+        return sys._base_executable # type: ignore # pylint: disable = protected-access
+    raise RuntimeError("Unable to resolve the system Python executable")
+
+
 def find_and_check_system_python_executable(python_versions: List[str]) -> str:
     python_executable = find_system_python_executable(python_versions)
     if python_executable is None or not shutil.which(python_executable):
@@ -23,7 +29,18 @@ def find_and_check_system_python_executable(python_versions: List[str]) -> str:
 
 def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
     if platform.system() == "Linux":
-        return "/usr/bin/python3"
+        possible_paths = []
+
+        for version in python_versions:
+            possible_paths += [
+                "/usr/bin/python" + version,
+            ]
+
+        for path in possible_paths:
+            if os.path.exists(path):
+                return path
+
+        return None
 
     if platform.system() == "Windows":
         possible_paths = []
@@ -43,7 +60,7 @@ def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
     raise ValueError("Unsupported platform: '%s'" % platform.system())
 
 
-def setup_virtual_environment(python_system_executable: str, venv_directory: str, simulate: bool) -> None:
+def setup_virtual_environment(system_python_executable: str, venv_directory: str, simulate: bool = False) -> None:
     logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
 
     venv_python_executable = get_venv_python_executable(venv_directory)
@@ -56,7 +73,7 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
             os.remove(os.path.join(venv_directory, "scripts", "python.exe"))
         shutil.rmtree(venv_directory)
 
-    venv_command = ExecutableCommand(python_system_executable)
+    venv_command = ExecutableCommand(system_python_executable)
     venv_command.add_arguments([ "-m", "venv", venv_directory ])
 
     run_python_command(venv_command, simulate = simulate)
@@ -68,9 +85,13 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
 
 
 def get_venv_python_executable(venv_directory: str) -> str:
+    return get_venv_executable(venv_directory, "python")
+
+
+def get_venv_executable(venv_directory: str, executable: str) -> str:
     if platform.system() == "Windows":
-        return os.path.join(venv_directory, "scripts", "python.exe")
-    return os.path.join(venv_directory, "bin", "python")
+        return os.path.join(venv_directory, "scripts", executable + ".exe")
+    return os.path.join(venv_directory, "bin", executable)
 
 
 def install_python_packages(python_executable: str,
