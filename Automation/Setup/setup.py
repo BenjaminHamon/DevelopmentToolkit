@@ -17,11 +17,6 @@ venv_directory = ".venv"
 
 
 def main() -> None:
-
-    # Prevent active pyvenv from overriding a python executable specified in a command
-    if "__PYVENV_LAUNCHER__" in os.environ:
-        del os.environ["__PYVENV_LAUNCHER__"]
-
     with automation_helpers.execute_in_workspace(__file__):
         arguments = parse_arguments()
         automation_helpers.configure_logging(arguments.verbosity)
