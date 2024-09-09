@@ -77,10 +77,6 @@ def setup_virtual_environment(system_python_executable: str, venv_directory: str
     venv_command.add_arguments([ "-m", "venv", venv_directory ])
 
     run_python_command(venv_command, simulate = simulate)
-
-    if platform.system() in [ "Darwin", "Linux" ] and not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
-        os.symlink("bin", os.path.join(venv_directory, "scripts"))
-
     install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
 
 
