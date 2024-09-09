@@ -10,6 +10,7 @@ from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
+from bhamon_development_toolkit.processes.process_result import ProcessResult
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.pytest_output_handler import PytestOutputHandler
 from bhamon_development_toolkit.python.pytest_scope import PytestScope
@@ -57,7 +58,7 @@ class PytestRunner:
             raise RuntimeError("Pytest session completed with failures")
 
 
-    async def _run_with_scope(self,
+    async def _run_with_scope(self, # pylint: disable = too-many-locals
             scope: PytestScope, result_directory: str, working_directory: Optional[str] = None, simulate: bool = False) -> bool:
 
         log_file_path = os.path.join(result_directory, scope.identifier + ".log")
@@ -72,19 +73,26 @@ class PytestRunner:
         command.add_internal_arguments([ "--json", os.path.abspath(json_report_file_path) ] if not simulate else [], [])
 
         process_options = ProcessOptions(working_directory = working_directory)
-        raw_output_logger = ProcessOutputLogger(process_helpers.create_raw_logger(log_file_path = log_file_path))
+        raw_logger = process_helpers.create_raw_logger(log_file_path = log_file_path)
+        process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
         pytest_output_handler = PytestOutputHandler(scope)
 
         logger.info("+ %s", process_helpers.format_executable_command(command.get_command_for_logging()))
 
         success = True
 
+        try:
+            if not simulate:
+                result = await self._process_runner.run(command, process_options, [ process_output_logger, pytest_output_handler ], check_exit_code = False)
+            else:
+                result = ProcessResult(executable = self._python_executable, exit_code = 0)
+        finally:
+            raw_logger.dispose()
+
+        self._check_exit_code(result.exit_code)
+        success = self._get_success_from_exit_code(result.exit_code)
+
         if not simulate:
-            result = await self._process_runner.run(command, process_options, [ raw_output_logger, pytest_output_handler ], check_exit_code = False)
-
-            self._check_exit_code(result.exit_code)
-            success = self._get_success_from_exit_code(result.exit_code)
-
             with open(json_report_file_path, mode = "r", encoding = "utf-8") as json_report_file:
                 json_report = json.load(json_report_file)
             with open(json_report_file_path + ".tmp", mode = "w", encoding = "utf-8") as json_report_file:

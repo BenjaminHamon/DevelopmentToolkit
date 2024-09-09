@@ -7,6 +7,7 @@ from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
+from bhamon_development_toolkit.processes.process_result import ProcessResult
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.pylint_output_handler import PylintOutputHandler
 from bhamon_development_toolkit.python.pylint_scope import PylintScope
@@ -66,7 +67,8 @@ class PylintRunner:
         command.add_internal_arguments([ "--output-format=text,json:%s" % os.path.abspath(json_report_file_path) ], [])
 
         process_options = ProcessOptions(working_directory = working_directory)
-        raw_output_logger = ProcessOutputLogger(process_helpers.create_raw_logger(log_file_path = log_file_path))
+        raw_logger = process_helpers.create_raw_logger(log_file_path = log_file_path)
+        process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
         pylint_output_handler = PylintOutputHandler()
 
         command.add_internal_arguments([ "--msg-template", pylint_output_handler.get_message_template() ], [])
@@ -75,11 +77,16 @@ class PylintRunner:
 
         success = True
 
-        if not simulate:
-            result = await self._process_runner.run(command, process_options, [ raw_output_logger, pylint_output_handler ], check_exit_code = False)
+        try:
+            if not simulate:
+                result = await self._process_runner.run(command, process_options, [ process_output_logger, pylint_output_handler ], check_exit_code = False)
+            else:
+                result = ProcessResult(executable = self._python_executable, exit_code = 0)
+        finally:
+            raw_logger.dispose()
 
-            self._check_exit_code(result.exit_code)
-            success = self._get_success_from_exit_code(result.exit_code)
+        self._check_exit_code(result.exit_code)
+        success = self._get_success_from_exit_code(result.exit_code)
 
         return success
 

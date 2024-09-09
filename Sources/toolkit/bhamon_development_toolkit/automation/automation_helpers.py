@@ -46,9 +46,9 @@ def configure_logging(arguments: argparse.Namespace):
     logging.addLevelName(logging.ERROR, "Error")
     logging.addLevelName(logging.CRITICAL, "Critical")
 
-    logging_helpers.configure_log_stream(sys.stdout, log_stream_verbosity, message_format, date_format)
+    logging_helpers.configure_log_stream(logging.root, sys.stdout, log_stream_verbosity, message_format, date_format)
     if log_file_path is not None:
-        logging_helpers.configure_log_file(log_file_path, log_file_verbosity, message_format, date_format, mode = "w", encoding = "utf-8")
+        logging_helpers.configure_log_file(logging.root, log_file_path, log_file_verbosity, message_format, date_format, mode = "w", encoding = "utf-8")
 
 
 def create_argument_parser() -> argparse.ArgumentParser:

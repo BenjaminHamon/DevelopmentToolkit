@@ -49,13 +49,16 @@ class PythonPackageBuilder:
         setup_command.add_arguments([ "setup.py", "bdist_wheel" ])
 
         process_options = ProcessOptions(working_directory = python_package.path_to_sources)
-        raw_logger = process_helpers.create_raw_logger(sys.stdout, log_file_path)
-        process_output_logger = ProcessOutputLogger(raw_logger)
+        raw_logger = process_helpers.create_raw_logger(stream = sys.stdout, log_file_path = log_file_path)
+        process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
 
         logger.info("+ %s", process_helpers.format_executable_command(setup_command.get_command_for_logging()))
 
-        if not simulate:
-            await self._process_runner.run(setup_command, process_options, [ process_output_logger ])
+        try:
+            if not simulate:
+                await self._process_runner.run(setup_command, process_options, [ process_output_logger ])
+        finally:
+            raw_logger.dispose()
 
         archive_name = python_package.name_for_file_system + "-" + version
         source_path = os.path.join(python_package.path_to_sources, "dist", archive_name + "-py3-none-any.whl")

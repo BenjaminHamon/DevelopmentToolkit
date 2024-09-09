@@ -4,6 +4,7 @@ from typing import TextIO
 
 
 all_log_levels = [ "debug", "info", "warning", "error", "critical" ]
+date_format_iso = "%Y-%m-%dT%H:%M:%S"
 
 
 def get_level_as_integer(level_as_string: str) -> int:
@@ -21,18 +22,18 @@ def get_level_as_integer(level_as_string: str) -> int:
     raise ValueError("Unknown logging level '%s'" % level_as_string)
 
 
-def configure_log_stream(stream: TextIO, level: str, message_format: str, date_format: str) -> None:
+def configure_log_stream(logger: logging.Logger, stream: TextIO, level: str, message_format: str, date_format: str) -> None:
     formatter = logging.Formatter(fmt = message_format, datefmt = date_format, style = "{")
 
     stream_handler = logging.StreamHandler(stream)
     stream_handler.setLevel(get_level_as_integer(level))
     stream_handler.formatter = formatter
 
-    logging.root.addHandler(stream_handler)
+    logger.addHandler(stream_handler)
 
 
 def configure_log_file( # pylint: disable = too-many-arguments
-        file_path: str, level: str, message_format: str, date_format: str, mode: str, encoding: str) -> None:
+        logger: logging.Logger, file_path: str, level: str, message_format: str, date_format: str, mode: str, encoding: str) -> None:
 
     if os.path.dirname(file_path):
         os.makedirs(os.path.dirname(file_path), exist_ok = True)
@@ -43,4 +44,4 @@ def configure_log_file( # pylint: disable = too-many-arguments
     file_handler.setLevel(get_level_as_integer(level))
     file_handler.formatter = formatter
 
-    logging.root.addHandler(file_handler)
+    logger.addHandler(file_handler)
