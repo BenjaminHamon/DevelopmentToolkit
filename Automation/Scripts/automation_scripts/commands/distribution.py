@@ -54,19 +54,16 @@ class _SetupCommand(AutomationCommand):
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         python_executable = sys.executable
         project_configuration: ProjectConfiguration = kwargs["configuration"]
+
         all_python_packages = project_configuration.list_python_packages()
+        python_package_metadata = project_configuration.get_python_package_metadata()
 
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         python_package_builder = PythonPackageBuilder(python_executable, process_runner)
 
         logger.info("Generating python package metadata")
         for python_package in all_python_packages:
-            python_package_builder.generate_package_metadata(
-                product_identifier = project_configuration.project_identifier,
-                project_version = project_configuration.project_version,
-                copyright_text = project_configuration.copyright,
-                python_package = python_package,
-                simulate = simulate)
+            python_package_builder.generate_package_metadata(python_package, python_package_metadata, simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

@@ -5,7 +5,6 @@ import shutil
 import sys
 from typing import Optional
 
-from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
@@ -13,6 +12,7 @@ from bhamon_development_toolkit.processes.process_output_collector import Proces
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.python_package import PythonPackage
+from bhamon_development_toolkit.python.python_package_metadata import PythonPackageMetadata
 
 
 logger = logging.getLogger("Python")
@@ -26,16 +26,16 @@ class PythonPackageBuilder:
         self._process_runner = process_runner
 
 
-    def generate_package_metadata(self, # pylint: disable = too-many-arguments
-            product_identifier: str, project_version: ProjectVersion, copyright_text: str, python_package: PythonPackage, simulate: bool = False) -> None:
+    def generate_package_metadata(self,
+            python_package: PythonPackage, python_package_metadata: PythonPackageMetadata, simulate: bool = False) -> None:
 
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
 
         metadata_content = ""
-        metadata_content += "__product__ = \"%s\"\n" % product_identifier
-        metadata_content += "__version__ = \"%s\"\n" % project_version.full_identifier
-        metadata_content += "__date__ = \"%s\"\n" % (project_version.revision_date.replace(tzinfo = None).isoformat() + "Z")
-        metadata_content += "__copyright__ = \"%s\"\n" % copyright_text
+        metadata_content += "__product__ = %r\n" % python_package_metadata.product_identifier
+        metadata_content += "__version__ = %r\n" % python_package_metadata.version_identifier
+        metadata_content += "__date__ = %r\n" % python_package_metadata.revision_date_as_string
+        metadata_content += "__copyright__ = %r\n" % python_package_metadata.copyright_text
 
         logger.debug("Writing '%s'", metadata_file_path)
         if not simulate:
