@@ -76,10 +76,10 @@ class PylintRunner:
         success = True
 
         if not simulate:
-            status = await self._process_runner.run(command, process_options, [ raw_output_logger, pylint_output_handler ], check_exit_code = False)
+            result = await self._process_runner.run(command, process_options, [ raw_output_logger, pylint_output_handler ], check_exit_code = False)
 
-            self._check_exit_code(status.exit_code)
-            success = self._get_success_from_exit_code(status.exit_code)
+            self._check_exit_code(result.exit_code)
+            success = self._get_success_from_exit_code(result.exit_code)
 
         return success
 
