@@ -9,6 +9,7 @@ from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.python_package import PythonPackage
@@ -42,34 +43,40 @@ class PythonPackageBuilder:
                 metadata_file.writelines(metadata_content)
 
 
-    async def build_distribution_package(self, # pylint: disable = too-many-arguments
-            python_package: PythonPackage, version: str, output_directory: str, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
+    def get_distribution_package_file_name(self, python_package: PythonPackage, version: str) -> str:
+        return "{name}-{version}-py3-none-any.whl".format(name = python_package.name_for_file_system, version = version)
+
+
+    async def build_distribution_package(self,
+            python_package: PythonPackage, output_directory: str, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         setup_command = ExecutableCommand(self._python_executable)
-        setup_command.add_arguments([ "setup.py", "bdist_wheel" ])
+        setup_command.add_arguments([ "-m", "pip", "wheel", "--no-deps", "--wheel-dir", output_directory, python_package.path_to_sources ])
 
-        process_options = ProcessOptions(working_directory = python_package.path_to_sources)
+        process_options = ProcessOptions()
         raw_logger = process_helpers.create_raw_logger(stream = sys.stdout, log_file_path = log_file_path)
         process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
+        process_output_collector = ProcessOutputCollector()
 
         logger.info("+ %s", process_helpers.format_executable_command(setup_command.get_command_for_logging()))
 
         try:
             if not simulate:
-                await self._process_runner.run(setup_command, process_options, [ process_output_logger ])
+                os.makedirs(output_directory, exist_ok = True) # Pip creates the output directory but use lowercase for some reason
+                await self._process_runner.run(setup_command, process_options, [ process_output_logger, process_output_collector ])
         finally:
             raw_logger.dispose()
 
-        archive_name = python_package.name_for_file_system + "-" + version
-        source_path = os.path.join(python_package.path_to_sources, "dist", archive_name + "-py3-none-any.whl")
-        destination_path = os.path.join(output_directory, archive_name + "-py3-none-any.whl")
+        filename_regex = r" filename=(" + re.escape(python_package.name_for_file_system) + r"-[0-9a-zA-Z\.\-\+]+-py3-none-any.whl) "
+        filename_match = re.search(filename_regex, process_output_collector.get_stdout())
 
-        if not simulate:
-            os.makedirs(os.path.dirname(destination_path), exist_ok = True)
-            shutil.copyfile(source_path, destination_path + ".tmp")
-            os.replace(destination_path + ".tmp", destination_path)
+        output_path = "__unknown__"
+        if filename_match is not None:
+            output_path = os.path.join(output_directory, filename_match.group(1))
 
-        logger.debug("Distribution package path: '%s'", destination_path)
+        logger.debug("Distribution package path: '%s'", output_path)
+        if log_file_path is not None:
+            logger.debug("Process log file: '%s'", log_file_path)
 
 
     def copy_distribution_package_for_release(self, # pylint: disable = too-many-arguments
