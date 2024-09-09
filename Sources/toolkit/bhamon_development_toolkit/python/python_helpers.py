@@ -97,6 +97,20 @@ def get_venv_executable(venv_directory: str, executable: str) -> str:
 def install_python_packages(python_executable: str,
         name_or_path_collection: List[str], python_package_repository: Optional[str] = None, simulate: bool = False) -> None:
 
+    install_command = ExecutableCommand(python_executable)
+    install_command.add_arguments([ "-m", "pip", "install", "--upgrade" ])
+
+    if python_package_repository is not None:
+        install_command.add_arguments([ "--extra-index", python_package_repository ])
+
+    install_command.add_arguments(name_or_path_collection)
+
+    run_python_command(install_command, simulate = simulate)
+
+
+def install_python_packages_for_development(python_executable: str,
+        name_or_path_collection: List[str], python_package_repository: Optional[str] = None, simulate: bool = False) -> None:
+
     def is_local_package(name_or_path: str) -> bool:
         return name_or_path.startswith(".") or "/" in name_or_path or "\\" in name_or_path
 
