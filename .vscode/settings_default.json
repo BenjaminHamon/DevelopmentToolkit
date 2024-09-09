@@ -1,6 +1,12 @@
 {
 	"$schema": "./schema.json",
 
+	"files.exclude": {
+        "Sources/*/*.egg-info": true,
+        "Sources/*/build": true,
+        "Sources/*/dist": true,
+	},
+
 	"isort.args": [ "--settings-file", ".isort.cfg" ],
 
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
