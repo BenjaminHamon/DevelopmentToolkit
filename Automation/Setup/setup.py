@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import sys
+from typing import Optional
 
 import automation_helpers
 import python_helpers
@@ -24,14 +25,7 @@ def main() -> None:
 
         log_script_information(project_configuration, simulate = arguments.simulate)
 
-        logger.info("Setting up local workspace (Path: %s)", os.getcwd())
-
-        system_python_executable = python_helpers.find_and_check_system_python_executable(python_versions)
-        venv_python_executable = python_helpers.get_venv_python_executable(venv_directory)
-        python_package_collection = [ "Automation/Scripts[dev]" ] + python_helpers.list_python_packages("Sources")
-
-        python_helpers.setup_virtual_environment(system_python_executable, venv_directory, simulate = arguments.simulate)
-        python_helpers.install_python_packages(venv_python_executable, python_package_collection, simulate = arguments.simulate)
+        setup_workspace(verbosity = arguments.verbosity, simulate = arguments.simulate)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -54,6 +48,27 @@ def log_script_information(configuration: dict, simulate: bool = False) -> None:
     logger.info("%s %s", configuration["ProjectDisplayName"], configuration["ProjectVersionFull"])
     logger.info("Script executing in '%s'", os.getcwd())
     logger.info("")
+
+
+def setup_workspace(verbosity: Optional[str] = None, simulate: bool = False) -> None:
+    if verbosity is None:
+        verbosity = "info"
+
+    logger.info("Setting up local workspace (Path: %s)", os.getcwd())
+
+    python_system_executable = python_helpers.resolve_system_python_executable()
+    venv_python_executable = python_helpers.get_venv_executable(venv_directory, "python")
+
+    logger.debug("")
+
+    logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
+    python_helpers.setup_virtual_environment(python_system_executable, venv_directory, simulate = simulate)
+
+    logger.debug("")
+
+    logger.info("Setting up python packages for development")
+    python_package_collection = [ os.path.join("Automation", "Scripts") ] + python_helpers.list_python_packages("Sources")
+    python_helpers.install_python_packages_for_development(venv_python_executable, python_package_collection, simulate = simulate)
 
 
 if __name__ == "__main__":
