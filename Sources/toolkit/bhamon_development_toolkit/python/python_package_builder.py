@@ -5,13 +5,14 @@ import shutil
 import sys
 from typing import Optional
 
-from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.python_package import PythonPackage
+from bhamon_development_toolkit.python.python_package_metadata import PythonPackageMetadata
 
 
 logger = logging.getLogger("Python")
@@ -25,16 +26,16 @@ class PythonPackageBuilder:
         self._process_runner = process_runner
 
 
-    def generate_package_metadata(self, # pylint: disable = too-many-arguments
-            product_identifier: str, project_version: ProjectVersion, copyright_text: str, python_package: PythonPackage, simulate: bool = False) -> None:
+    def generate_package_metadata(self,
+            python_package: PythonPackage, python_package_metadata: PythonPackageMetadata, simulate: bool = False) -> None:
 
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
 
         metadata_content = ""
-        metadata_content += "__product__ = \"%s\"\n" % product_identifier
-        metadata_content += "__version__ = \"%s\"\n" % project_version.full_identifier
-        metadata_content += "__date__ = \"%s\"\n" % (project_version.revision_date.replace(tzinfo = None).isoformat() + "Z")
-        metadata_content += "__copyright__ = \"%s\"\n" % copyright_text
+        metadata_content += "__product__ = %r\n" % python_package_metadata.product_identifier
+        metadata_content += "__version__ = %r\n" % python_package_metadata.version_identifier
+        metadata_content += "__date__ = %r\n" % python_package_metadata.revision_date_as_string
+        metadata_content += "__copyright__ = %r\n" % python_package_metadata.copyright_text
 
         logger.debug("Writing '%s'", metadata_file_path)
         if not simulate:
@@ -42,34 +43,40 @@ class PythonPackageBuilder:
                 metadata_file.writelines(metadata_content)
 
 
-    async def build_distribution_package(self, # pylint: disable = too-many-arguments
-            python_package: PythonPackage, version: str, output_directory: str, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
+    def get_distribution_package_file_name(self, python_package: PythonPackage, version: str) -> str:
+        return "{name}-{version}-py3-none-any.whl".format(name = python_package.name_for_file_system, version = version)
+
+
+    async def build_distribution_package(self,
+            python_package: PythonPackage, output_directory: str, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         setup_command = ExecutableCommand(self._python_executable)
-        setup_command.add_arguments([ "setup.py", "bdist_wheel" ])
+        setup_command.add_arguments([ "-m", "pip", "wheel", "--no-deps", "--wheel-dir", output_directory, python_package.path_to_sources ])
 
-        process_options = ProcessOptions(working_directory = python_package.path_to_sources)
+        process_options = ProcessOptions()
         raw_logger = process_helpers.create_raw_logger(stream = sys.stdout, log_file_path = log_file_path)
         process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
+        process_output_collector = ProcessOutputCollector()
 
         logger.info("+ %s", process_helpers.format_executable_command(setup_command.get_command_for_logging()))
 
         try:
             if not simulate:
-                await self._process_runner.run(setup_command, process_options, [ process_output_logger ])
+                os.makedirs(output_directory, exist_ok = True) # Pip creates the output directory but use lowercase for some reason
+                await self._process_runner.run(setup_command, process_options, [ process_output_logger, process_output_collector ])
         finally:
             raw_logger.dispose()
 
-        archive_name = python_package.name_for_file_system + "-" + version
-        source_path = os.path.join(python_package.path_to_sources, "dist", archive_name + "-py3-none-any.whl")
-        destination_path = os.path.join(output_directory, archive_name + "-py3-none-any.whl")
+        filename_regex = r" filename=(" + re.escape(python_package.name_for_file_system) + r"-[0-9a-zA-Z\.\-\+]+-py3-none-any.whl) "
+        filename_match = re.search(filename_regex, process_output_collector.get_stdout())
 
-        if not simulate:
-            os.makedirs(os.path.dirname(destination_path), exist_ok = True)
-            shutil.copyfile(source_path, destination_path + ".tmp")
-            os.replace(destination_path + ".tmp", destination_path)
+        output_path = "__unknown__"
+        if filename_match is not None:
+            output_path = os.path.join(output_directory, filename_match.group(1))
 
-        logger.debug("Distribution package path: '%s'", destination_path)
+        logger.debug("Distribution package path: '%s'", output_path)
+        if log_file_path is not None:
+            logger.debug("Process log file: '%s'", log_file_path)
 
 
     def copy_distribution_package_for_release(self, # pylint: disable = too-many-arguments

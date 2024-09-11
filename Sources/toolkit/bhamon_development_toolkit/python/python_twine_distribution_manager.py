@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
+from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
-from bhamon_development_toolkit.python import python_helpers
 
 
 logger = logging.getLogger("Python")
@@ -37,4 +37,4 @@ class PythonTwineDistributionManager:
 
         upload_command.add_arguments([ package_path ])
 
-        python_helpers.run_python_command(upload_command, simulate = simulate)
+        process_helpers.run_simple(logger, upload_command, simulate = simulate)

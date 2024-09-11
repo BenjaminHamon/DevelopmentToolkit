@@ -3,6 +3,7 @@ from typing import List
 
 from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.python.python_package import PythonPackage
+from bhamon_development_toolkit.python.python_package_metadata import PythonPackageMetadata
 
 
 class ProjectConfiguration:
@@ -34,6 +35,15 @@ class ProjectConfiguration:
             "version": self.project_version.identifier,
             "revision": self.project_version.revision_short,
         }
+
+
+    def get_python_package_metadata(self) -> PythonPackageMetadata:
+        return PythonPackageMetadata(
+            product_identifier = self.project_identifier,
+            version_identifier = self.project_version.full_identifier,
+            revision_date = self.project_version.revision_date,
+            copyright_text = self.copyright,
+        )
 
 
     def list_automation_packages(self) -> List[PythonPackage]:
