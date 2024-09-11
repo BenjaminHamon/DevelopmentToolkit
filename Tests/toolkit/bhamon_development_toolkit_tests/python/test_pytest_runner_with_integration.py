@@ -15,7 +15,7 @@ from bhamon_development_toolkit.python.pytest_scope import PytestScope
 async def test_run_with_simulate(tmpdir):
     python_executable = "my-python"
     process_runner = ProcessRunner(ProcessSpawner(is_console = True))
-    pytest_runner = PytestRunner(process_runner, python_executable) # type: ignore
+    pytest_runner = PytestRunner(process_runner, python_executable)
 
     all_scopes = [ PytestScope("All", "my-test-directory", None) ]
     result_directory = os.path.join(tmpdir, "TestResults")
@@ -28,7 +28,7 @@ async def test_run_with_simulate(tmpdir):
 async def test_run_with_success(tmpdir):
     python_executable = sys.executable
     process_runner = ProcessRunner(ProcessSpawner(is_console = True))
-    pytest_runner = PytestRunner(process_runner, python_executable) # type: ignore
+    pytest_runner = PytestRunner(process_runner, python_executable)
 
     test_directory = os.path.join(tmpdir, "Tests")
 
@@ -48,7 +48,7 @@ async def test_run_with_success(tmpdir):
 async def test_run_with_failure(tmpdir):
     python_executable = sys.executable
     process_runner = ProcessRunner(ProcessSpawner(is_console = True))
-    pytest_runner = PytestRunner(process_runner, python_executable) # type: ignore
+    pytest_runner = PytestRunner(process_runner, python_executable)
 
     test_directory = os.path.join(tmpdir, "Tests")
 
@@ -69,7 +69,7 @@ async def test_run_with_failure(tmpdir):
 async def test_run_with_no_tests(tmpdir):
     python_executable = sys.executable
     process_runner = ProcessRunner(ProcessSpawner(is_console = True))
-    pytest_runner = PytestRunner(process_runner, python_executable) # type: ignore
+    pytest_runner = PytestRunner(process_runner, python_executable)
 
     test_directory = os.path.join(tmpdir, "Tests")
 

@@ -3,12 +3,13 @@ import os
 import re
 import shutil
 import sys
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
 from bhamon_development_toolkit.processes.process_output_collector import ProcessOutputCollector
+from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.python.python_package import PythonPackage
@@ -57,13 +58,14 @@ class PythonPackageBuilder:
         raw_logger = process_helpers.create_raw_logger(stream = sys.stdout, log_file_path = log_file_path)
         process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
         process_output_collector = ProcessOutputCollector()
+        output_handlers: List[ProcessOutputHandler] = [ process_output_logger, process_output_collector ]
 
         logger.info("+ %s", process_helpers.format_executable_command(setup_command.get_command_for_logging()))
 
         try:
             if not simulate:
                 os.makedirs(output_directory, exist_ok = True) # Pip creates the output directory but use lowercase for some reason
-                await self._process_runner.run(setup_command, process_options, [ process_output_logger, process_output_collector ])
+                await self._process_runner.run(setup_command, process_options, output_handlers, check_exit_code = True)
         finally:
             raw_logger.dispose()
 
