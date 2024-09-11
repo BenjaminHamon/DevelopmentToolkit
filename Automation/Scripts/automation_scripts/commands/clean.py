@@ -34,8 +34,10 @@ class CleanCommand(AutomationCommand):
         all_python_packages = project_configuration.list_automation_packages() + project_configuration.list_python_packages()
 
         self.clean_artifacts(artifact_directory, simulate = simulate)
+        self.clean_python_cache(os.path.join("Automation", "Setup"), simulate = simulate)
         for python_package in all_python_packages:
             self.clean_python_package(python_package, simulate = simulate)
+        self.clean_pytest_cache(simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
@@ -56,7 +58,7 @@ class CleanCommand(AutomationCommand):
         for directory in directories_to_remove:
             self._remove_directory(directory, simulate = simulate)
 
-        metadata_file_path = os.path.join(python_package.path_to_sources, "__metadata__.py")
+        metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
         self._remove_file(metadata_file_path, simulate = simulate)
 
         self.clean_python_cache(python_package.path_to_sources, simulate = simulate)
@@ -74,15 +76,22 @@ class CleanCommand(AutomationCommand):
             self._remove_directory(directory, simulate = simulate)
 
 
+    def clean_pytest_cache(self, simulate: bool = False) -> None:
+        directories_to_remove = [ ".pytest_cache" ]
+
+        for directory in directories_to_remove:
+            self._remove_directory(directory, simulate = simulate)
+
+
     def _remove_directory(self, directory_to_remove: str, simulate: bool = False) -> None:
         if os.path.exists(directory_to_remove):
-            logger.debug("Removing directory '%s'", directory_to_remove)
+            logger.debug("Removing '%s'", directory_to_remove)
             if not simulate:
                 shutil.rmtree(directory_to_remove)
 
 
     def _remove_file(self, file_to_remove: str, simulate: bool = False) -> None:
         if os.path.exists(file_to_remove):
-            logger.debug("Removing file '%s'", file_to_remove)
+            logger.debug("Removing '%s'", file_to_remove)
             if not simulate:
-                shutil.rmtree(file_to_remove)
+                os.remove(file_to_remove)
