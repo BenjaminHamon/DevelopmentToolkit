@@ -3,48 +3,25 @@ import logging
 import os
 import platform
 import shutil
-import subprocess
 import sys
 from typing import List, Optional
+
+import process_helpers
 
 
 logger = logging.getLogger("Python")
 
 
-def find_and_check_system_python_executable(python_versions: List[str]) -> str:
-    python_executable = find_system_python_executable(python_versions)
-    if python_executable is None or not shutil.which(python_executable):
-        raise RuntimeError("Python3 is required (Path: %r)" % python_executable)
-
-    return python_executable
+def resolve_system_python_executable() -> str:
+    if hasattr(sys, "_base_executable"):
+        return sys._base_executable # type: ignore # pylint: disable = protected-access
+    raise RuntimeError("Unable to resolve the system Python executable")
 
 
-def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
-    if platform.system() == "Linux":
-        return "/usr/bin/python3"
+def setup_virtual_environment(
+        system_python_executable: str, venv_directory: str, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
-    if platform.system() == "Windows":
-        possible_paths = []
-
-        for version in python_versions:
-            possible_paths += [
-                os.path.join(os.environ["SystemDrive"] + "\\", "Python%s" % version.replace(".", ""), "python.exe"),
-                os.path.join(os.environ["ProgramFiles"], "Python%s" % version.replace(".", ""), "python.exe"),
-            ]
-
-        for path in possible_paths:
-            if os.path.exists(path):
-                return path
-
-        return None
-
-    raise ValueError("Unsupported platform: '%s'" % platform.system())
-
-
-def setup_virtual_environment(system_python_executable: str, venv_directory: str, simulate: bool) -> None:
-    logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
-
-    venv_python_executable = get_venv_python_executable(venv_directory)
+    venv_python_executable = get_venv_executable(venv_directory, "python")
     if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
         raise RuntimeError("Active python is the target virtual environment")
 
@@ -54,75 +31,55 @@ def setup_virtual_environment(system_python_executable: str, venv_directory: str
             os.remove(os.path.join(venv_directory, "scripts", "python.exe"))
         shutil.rmtree(venv_directory)
 
-    run_python_command([ system_python_executable, "-m", "venv", venv_directory ], simulate = simulate)
+    venv_command = [ system_python_executable ]
+    venv_command += [ "-m", "venv", venv_directory ]
 
-    if platform.system() == "Darwin": # pylint: disable = no-else-raise
-        raise NotImplementedError("MacOS is not supported")
+    process_helpers.run_simple(logger, venv_command, simulate = simulate)
 
-    elif platform.system() == "Linux":
-        if not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
-            os.symlink("bin", os.path.join(venv_directory, "scripts"))
-        if os.path.exists("pip.conf") and not simulate:
-            shutil.copy("pip.conf", os.path.join(".venv", "pip.conf"))
-
-    elif platform.system() == "Windows":
-        if os.path.exists("pip.conf") and not simulate:
-            shutil.copy("pip.conf", os.path.join(".venv", "pip.ini"))
-
-    else:
-        raise NotImplementedError("Unsupported system: '%s'" % platform.system())
+    if pip_configuration_file_path is not None:
+        pip_configuration_file_path_in_venv = _get_pip_configuration_file_path(venv_directory)
+        if not simulate:
+            shutil.copy(pip_configuration_file_path, pip_configuration_file_path_in_venv)
 
     install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
 
 
-def get_venv_python_executable(venv_directory: str) -> str:
+def get_venv_executable(venv_directory: str, executable: str) -> str:
     if platform.system() == "Windows":
-        return os.path.join(venv_directory, "scripts", "python.exe")
-    return os.path.join(venv_directory, "bin", "python")
+        return os.path.join(venv_directory, "scripts", executable + ".exe")
+    return os.path.join(venv_directory, "bin", executable)
+
+
+def _get_pip_configuration_file_path(venv_directory: str) -> str:
+    if platform.system() == "Windows":
+        return os.path.join(venv_directory, "pip.ini")
+    return os.path.join(venv_directory, "pip.conf")
 
 
 def list_python_packages(source_directory: str) -> List[str]:
     package_collection: List[str] = []
-    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "setup.py")):
+    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "pyproject.toml")):
         package_collection.append(os.path.dirname(setup_file_path))
 
     return package_collection
 
 
-def install_python_packages(python_executable: str,
-        name_or_path_collection: List[str], python_package_repository: Optional[str] = None, simulate: bool = False) -> None:
+def install_python_packages(python_executable: str, name_or_path_collection: List[str], simulate: bool = False) -> None:
+    install_command = [ python_executable ]
+    install_command += [ "-m", "pip", "install", "--upgrade" ] + name_or_path_collection
+
+    process_helpers.run_simple(logger, install_command, simulate = simulate)
+
+
+def install_python_packages_for_development(python_executable: str,name_or_path_collection: List[str], simulate: bool = False) -> None:
 
     def is_local_package(name_or_path: str) -> bool:
         return name_or_path.startswith(".") or "/" in name_or_path or "\\" in name_or_path
 
-    install_command = [ python_executable, "-m", "pip", "install", "--upgrade" ]
-
-    if python_package_repository is not None:
-        install_command += [ "--extra-index", python_package_repository ]
+    install_command = [ python_executable ]
+    install_command += [ "-m", "pip", "install", "--upgrade" ]
 
     for name_or_path in name_or_path_collection:
         install_command += [ "--editable", name_or_path ] if is_local_package(name_or_path) else [ name_or_path ]
 
-    run_python_command(install_command, simulate = simulate)
-
-
-def run_python_command(command: List[str], working_directory: Optional[str] = None, simulate: bool = False) -> None:
-    logger.info("+ %s", " ".join(command))
-
-    subprocess_options = {
-        "cwd": working_directory,
-        "capture_output": True,
-        "text": True,
-        "encoding": "utf-8",
-        "stdin": subprocess.DEVNULL,
-    }
-
-    if not simulate:
-        process_result = subprocess.run(command, check = False, **subprocess_options)
-        for line in process_result.stdout.splitlines():
-            logger.debug(line)
-        for line in process_result.stderr.splitlines():
-            logger.error(line)
-
-        if process_result.returncode != 0:
-            raise RuntimeError("Python command failed (ExitCode: %r)" % process_result.returncode)
+    process_helpers.run_simple(logger, install_command, simulate = simulate)

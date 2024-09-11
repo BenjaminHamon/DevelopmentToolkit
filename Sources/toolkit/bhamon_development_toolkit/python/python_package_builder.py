@@ -3,7 +3,7 @@ import os
 import re
 import shutil
 import sys
-from typing import Optional
+from typing import Dict, Optional
 
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
@@ -77,6 +77,35 @@ class PythonPackageBuilder:
         logger.debug("Distribution package path: '%s'", output_path)
         if log_file_path is not None:
             logger.debug("Process log file: '%s'", log_file_path)
+
+
+    async def build_distribution_package_with_custom_settings(self, # pylint: disable = too-many-arguments
+            python_package: PythonPackage, output_directory: str, settings_dictionary: Dict[str,str],
+            log_file_path: Optional[str] = None, simulate: bool = False) -> None:
+
+        pyproject_toml_file_path = os.path.join(python_package.path_to_sources, "pyproject.toml")
+        if not os.path.exists(pyproject_toml_file_path):
+            raise ValueError("pyproject.toml not found (Path: '%s')" % pyproject_toml_file_path)
+
+        original_pyproject_data: str = ""
+        with open(pyproject_toml_file_path, mode = "r", encoding = "utf-8") as pyproject_toml_file:
+            original_pyproject_data = pyproject_toml_file.read()
+
+        pyproject_data = original_pyproject_data
+        for key, value in settings_dictionary.items():
+            pyproject_data = re.sub(r"^(" + re.escape(key) + r"\s*=\s*)(.*)", r"\1" + repr(value), pyproject_data, flags = re.MULTILINE)
+
+        if not simulate:
+            with open(pyproject_toml_file_path + ".tmp", mode = "w", encoding = "utf-8") as pyproject_toml_file:
+                pyproject_toml_file.write(pyproject_data)
+            os.replace(pyproject_toml_file_path + ".tmp", pyproject_toml_file_path)
+
+        try:
+            await self.build_distribution_package(python_package, output_directory, log_file_path = log_file_path, simulate = simulate)
+        finally:
+            with open(pyproject_toml_file_path + ".tmp", mode = "w", encoding = "utf-8") as pyproject_toml_file:
+                pyproject_toml_file.write(original_pyproject_data)
+            os.replace(pyproject_toml_file_path + ".tmp", pyproject_toml_file_path)
 
 
     def copy_distribution_package_for_release(self, # pylint: disable = too-many-arguments
