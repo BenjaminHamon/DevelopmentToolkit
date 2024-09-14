@@ -8,28 +8,20 @@ from bhamon_development_toolkit.automation import automation_helpers
 from bhamon_development_toolkit.python.python_package import PythonPackage
 
 from automation_scripts.commands.lint import LintCommand
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
 
 
 @pytest.mark.asyncio
-async def test_run_with_success(tmpdir):
-    with automation_helpers.execute_in_workspace(tmpdir):
-        project_configuration = mockito.mock(spec = ProjectConfiguration)
-        python_package = mockito.mock(spec = PythonPackage)
-        python_package.identifier = "my-python-package" # type: ignore
-        python_package.path_to_sources = "Sources" # type: ignore
-        python_package.name_for_module_import = "Sources" # type: ignore
+async def test_run_with_success(workspace, automation_configuration):
+    with automation_helpers.execute_in_workspace(workspace):
+        python_package = automation_configuration.project_python_elements.package_collection[0]
+        module_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "my_module.py")
+        with open(module_path, mode = "w", encoding = "utf-8") as source_file:
+            source_file.write("\"\"\"Sample module\"\"\"\n")
 
         command = LintCommand()
         arguments = argparse.Namespace(run_identifier = "my-run-identifier")
 
-        os.makedirs(python_package.path_to_sources)
-        with open(os.path.join(python_package.path_to_sources, "my_module.py"), mode = "w", encoding = "utf-8") as source_file:
-            source_file.write("\"\"\"Sample module\"\"\"\n")
-
-        mockito.when(project_configuration).list_python_packages().thenReturn([ python_package ])
-
-        await command.run_async(arguments, configuration = project_configuration, simulate = False)
+        await command.run_async(arguments, configuration = automation_configuration, simulate = False)
 
 
 @pytest.mark.asyncio
