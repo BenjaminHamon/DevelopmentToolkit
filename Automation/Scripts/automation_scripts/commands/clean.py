@@ -3,6 +3,7 @@ import glob
 import logging
 import os
 import shutil
+from typing import List
 
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 from bhamon_development_toolkit.python.python_package import PythonPackage
@@ -30,14 +31,21 @@ class CleanCommand(AutomationCommand):
         logger.info("Cleaning the workspace")
         logger.info("")
 
-        artifact_directory = "Artifacts"
-        all_python_packages = project_configuration.list_automation_packages() + project_configuration.list_python_packages()
+        logger.info("Cleaning artifacts")
+        self.clean_artifacts("Artifacts", simulate = simulate)
+        logger.debug("")
 
-        self.clean_artifacts(artifact_directory, simulate = simulate)
-        self.clean_python_cache(os.path.join("Automation", "Setup"), simulate = simulate)
-        for python_package in all_python_packages:
-            self.clean_python_package(python_package, simulate = simulate)
-        self.clean_pytest_cache(simulate = simulate)
+        logger.info("Cleaning python sources")
+        self.clean_python_sources(project_configuration.list_python_packages(), simulate = simulate)
+        logger.debug("")
+
+        logger.info("Cleaning python tests")
+        self.clean_python_tests(simulate = simulate)
+        logger.debug("")
+
+        logger.info("Cleaning automation")
+        self.clean_automation(project_configuration.list_automation_packages(), simulate = simulate)
+        logger.debug("")
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
@@ -48,7 +56,22 @@ class CleanCommand(AutomationCommand):
         self._remove_directory(artifact_directory, simulate = simulate)
 
 
-    def clean_python_package(self, python_package: PythonPackage, simulate: bool = False) -> None:
+    def clean_python_sources(self, python_package_collection: List[PythonPackage], simulate: bool = False) -> None:
+        for python_package in python_package_collection:
+            self._clean_python_package(python_package, simulate = simulate)
+
+
+    def clean_python_tests(self, simulate: bool = False) -> None:
+        self._clean_pytest_cache(simulate = simulate)
+
+
+    def clean_automation(self, python_package_collection: List[PythonPackage], simulate: bool = False) -> None:
+        for python_package in python_package_collection:
+            self._clean_python_package(python_package, simulate = simulate)
+        self._clean_python_cache(os.path.join("Automation", "Setup"), simulate = simulate)
+
+
+    def _clean_python_package(self, python_package: PythonPackage, simulate: bool = False) -> None:
         directories_to_remove = [
             os.path.join(python_package.path_to_sources, "build"),
             os.path.join(python_package.path_to_sources, "dist"),
@@ -61,12 +84,12 @@ class CleanCommand(AutomationCommand):
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
         self._remove_file(metadata_file_path, simulate = simulate)
 
-        self.clean_python_cache(python_package.path_to_sources, simulate = simulate)
+        self._clean_python_cache(python_package.path_to_sources, simulate = simulate)
         if python_package.path_to_tests is not None:
-            self.clean_python_cache(python_package.path_to_tests, simulate = simulate)
+            self._clean_python_cache(python_package.path_to_tests, simulate = simulate)
 
 
-    def clean_python_cache(self, source_directory: str, simulate: bool = False) -> None:
+    def _clean_python_cache(self, source_directory: str, simulate: bool = False) -> None:
         if not os.path.exists(source_directory):
             return
 
@@ -76,7 +99,7 @@ class CleanCommand(AutomationCommand):
             self._remove_directory(directory, simulate = simulate)
 
 
-    def clean_pytest_cache(self, simulate: bool = False) -> None:
+    def _clean_pytest_cache(self, simulate: bool = False) -> None:
         directories_to_remove = [ ".pytest_cache" ]
 
         for directory in directories_to_remove:
