@@ -23,6 +23,7 @@ class TestCommand(AutomationCommand):
     def configure_argument_parser(self, subparsers: argparse._SubParsersAction, **kwargs) -> argparse.ArgumentParser:
         parser: argparse.ArgumentParser = subparsers.add_parser("test", help = "run tests from the Python packages")
         parser.add_argument("--run-identifier", metavar = "<identifier>", help = "set the identifier for the run")
+        parser.add_argument("--filters", nargs = "*", metavar = "<expression>", help = "set filter expressions for selecting tests")
         return parser
 
 
@@ -36,6 +37,11 @@ class TestCommand(AutomationCommand):
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         project_configuration: ProjectConfiguration = kwargs["configuration"]
+        run_identifier: Optional[str] = arguments.run_identifier
+        all_filter_expressions: Optional[List[str]] = arguments.filters
+
+        if run_identifier is None:
+            run_identifier = str(uuid.uuid4())
 
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         pytest_runner = PytestRunner(process_runner, sys.executable)
@@ -44,11 +50,8 @@ class TestCommand(AutomationCommand):
         for python_package in project_configuration.list_python_packages():
             if python_package.path_to_tests is None:
                 raise ValueError("Python package '%s' has no tests" % python_package.identifier)
-            all_python_scopes.append(PytestScope(identifier = python_package.identifier, path = python_package.path_to_tests, filter_expression = None))
-
-        run_identifier: Optional[str] = arguments.run_identifier
-        if run_identifier is None:
-            run_identifier = str(uuid.uuid4())
+            for filter_expression in (all_filter_expressions if all_filter_expressions is not None else [ None ]):
+                all_python_scopes.append(PytestScope(python_package.identifier, python_package.path_to_tests, filter_expression))
 
         result_directory = os.path.join("Artifacts", "TestResults")
 

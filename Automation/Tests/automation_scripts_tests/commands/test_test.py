@@ -18,7 +18,7 @@ async def test_run_with_success(tmpdir):
         python_package = PythonPackage(identifier = "my-python-package", path_to_sources = "Sources", path_to_tests = "Tests")
 
         command = TestCommand()
-        arguments = argparse.Namespace(run_identifier = "my-run-identifier")
+        arguments = argparse.Namespace(run_identifier = "my-run-identifier", filters = None)
 
         if python_package.path_to_tests is None:
             raise ValueError("Python package has no tests")
@@ -39,7 +39,7 @@ async def test_run_with_failure(tmpdir):
         python_package = PythonPackage(identifier = "my-python-package", path_to_sources = "Sources", path_to_tests = "Tests")
 
         command = TestCommand()
-        arguments = argparse.Namespace(run_identifier = "my-run-identifier")
+        arguments = argparse.Namespace(run_identifier = "my-run-identifier", filters = None)
 
         if python_package.path_to_tests is None:
             raise ValueError("Python package has no tests")
@@ -61,7 +61,7 @@ async def test_run_with_simulate(tmpdir):
         python_package = PythonPackage(identifier = "my-python-package", path_to_sources = "Sources", path_to_tests = "Tests")
 
         command = TestCommand()
-        arguments = argparse.Namespace(run_identifier = "my-run-identifier")
+        arguments = argparse.Namespace(run_identifier = "my-run-identifier", filters = None)
 
         mockito.when(project_configuration).list_python_packages().thenReturn([ python_package ])
 
