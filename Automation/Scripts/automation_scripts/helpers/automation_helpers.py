@@ -11,7 +11,7 @@ from bhamon_development_toolkit.automation.automation_helpers import configure_l
 from bhamon_development_toolkit.automation.automation_helpers import create_argument_parser # pylint: disable = unused-import
 from bhamon_development_toolkit.automation.automation_helpers import create_command_instance # pylint: disable = unused-import
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
+from automation_scripts.configuration.project_metadata import ProjectMetadata
 
 
 logger = logging.getLogger("Main")
@@ -24,12 +24,12 @@ def execute_in_workspace(script_path: str) -> Generator[None,None,None]:
         yield
 
 
-def log_script_information(configuration: ProjectConfiguration, simulate: bool = False) -> None:
+def log_script_information(project_metadata: ProjectMetadata, simulate: bool = False) -> None:
     if simulate:
         logger.info("(( The script is running as a simulation ))")
         logger.info("")
 
-    logger.info("%s %s", configuration.project_display_name, configuration.project_version.full_identifier)
-    logger.info("Branch: '%s', Revision: '%s'", configuration.project_version.branch, configuration.project_version.revision)
+    logger.info("%s %s", project_metadata.display_name, project_metadata.version.full_identifier)
+    logger.info("Branch: '%s', Revision: '%s'", project_metadata.version.branch, project_metadata.version.revision)
     logger.info("Script executing in '%s'", os.getcwd())
     logger.info("")

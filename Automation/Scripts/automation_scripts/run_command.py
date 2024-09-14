@@ -15,8 +15,7 @@ logger = logging.getLogger("Main")
 
 def main():
     with automation_helpers.execute_in_workspace(__file__):
-        environment = configuration_manager.load_environment()
-        configuration = configuration_manager.load_configuration()
+        configuration = configuration_manager.load_automation_configuration()
         command_collection = list_commands()
 
         argument_parser = create_argument_parser(command_collection)
@@ -25,9 +24,9 @@ def main():
 
         automation_helpers.configure_logging(arguments)
 
-        automation_helpers.log_script_information(configuration, arguments.simulate)
-        command_instance.check_requirements(arguments, environment = environment, configuration = configuration)
-        run_coroutine = command_instance.run_async(arguments, environment = environment, configuration = configuration, simulate = arguments.simulate)
+        automation_helpers.log_script_information(configuration.project_metadata, arguments.simulate)
+        command_instance.check_requirements(arguments, configuration = configuration)
+        run_coroutine = command_instance.run_async(arguments, configuration = configuration, simulate = arguments.simulate)
 
         asyncio_context = AsyncioContext()
         asyncio_context.run(run_coroutine)

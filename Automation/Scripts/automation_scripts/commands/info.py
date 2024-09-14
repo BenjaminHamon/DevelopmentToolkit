@@ -3,7 +3,7 @@ import logging
 
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
+from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 
 
 logger = logging.getLogger("Main")
@@ -21,12 +21,12 @@ class InfoCommand(AutomationCommand):
 
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
 
-        logger.info("ProjectIdentifier: %s", project_configuration.project_identifier)
-        logger.info("ProjectDisplayName: %s", project_configuration.project_display_name)
-        logger.info("ProjectVersion: %s", project_configuration.project_version.full_identifier)
-        logger.info("Copyright: %s", project_configuration.copyright)
+        logger.info("ProjectIdentifier: %s", automation_configuration.project_metadata.identifier)
+        logger.info("ProjectDisplayName: %s", automation_configuration.project_metadata.display_name)
+        logger.info("ProjectVersion: %s", automation_configuration.project_metadata.version.full_identifier)
+        logger.info("Copyright: %s", automation_configuration.project_metadata.copyright_text)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

@@ -1,25 +1,40 @@
 import json
+import os
 
 from bhamon_development_toolkit.automation.project_version import ProjectVersion
+from bhamon_development_toolkit.python.python_package import PythonPackage
 from bhamon_development_toolkit.revision_control.git_client import GitClient
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
-from automation_scripts.configuration.project_environment import ProjectEnvironment
+from automation_scripts.configuration.automation_configuration import AutomationConfiguration
+from automation_scripts.configuration.project_metadata import ProjectMetadata
+from automation_scripts.configuration.project_python_elements import ProjectPythonElements
+from automation_scripts.configuration.workspace_environment import WorkspaceEnvironment
 
 
-def load_environment() -> ProjectEnvironment:
-    return ProjectEnvironment()
+
+def load_automation_configuration() -> AutomationConfiguration:
+    automation_python_package = PythonPackage(
+        identifier = "automation-scripts",
+        path_to_sources = os.path.join("Automation", "Scripts"),
+        path_to_tests = os.path.join("Automation", "Tests"))
+
+    return AutomationConfiguration(
+        project_metadata = load_project_metadata(),
+        project_python_elements = load_project_python_elements(),
+        workspace_environment = load_workspace_environment(),
+        automation_python_package = automation_python_package,
+    )
 
 
-def load_configuration() -> ProjectConfiguration:
+def load_project_metadata() -> ProjectMetadata:
     json_file_path = "ProjectConfiguration.json"
     with open(json_file_path, mode = "r", encoding = "utf-8") as json_file:
         project_configuration_as_dict = json.load(json_file)
 
-    return ProjectConfiguration(
-        project_identifier = project_configuration_as_dict["ProjectIdentifier"],
-        project_display_name = project_configuration_as_dict["ProjectDisplayName"],
-        project_version = load_project_version(project_configuration_as_dict["ProjectVersionIdentifier"]),
+    return ProjectMetadata(
+        identifier = project_configuration_as_dict["ProjectIdentifier"],
+        display_name = project_configuration_as_dict["ProjectDisplayName"],
+        version = load_project_version(project_configuration_as_dict["ProjectVersionIdentifier"]),
         copyright_text = project_configuration_as_dict["Copyright"],
         author = project_configuration_as_dict["Author"],
         author_email = project_configuration_as_dict["AuthorEmail"],
@@ -40,3 +55,18 @@ def load_project_version(identifier: str) -> ProjectVersion:
         revision_date = revision_date,
         branch = branch,
     )
+
+
+def load_project_python_elements() -> ProjectPythonElements:
+    return ProjectPythonElements(
+        package_collection = [
+            PythonPackage(
+                identifier = "bhamon-development-toolkit",
+                path_to_sources = os.path.join("Sources", "toolkit"),
+                path_to_tests = os.path.join("Tests", "toolkit")),
+        ]
+    )
+
+
+def load_workspace_environment() -> WorkspaceEnvironment:
+    return WorkspaceEnvironment()

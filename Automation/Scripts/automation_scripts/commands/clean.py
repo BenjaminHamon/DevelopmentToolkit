@@ -8,7 +8,7 @@ from bhamon_development_toolkit.automation import automation_helpers
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 from bhamon_development_toolkit.python.python_package import PythonPackage
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
+from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 
 
 logger = logging.getLogger("Main")
@@ -26,7 +26,7 @@ class CleanCommand(AutomationCommand):
 
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
 
         logger.info("Cleaning the workspace")
         logger.info("")
@@ -36,7 +36,7 @@ class CleanCommand(AutomationCommand):
         logger.debug("")
 
         logger.info("Cleaning python sources")
-        self.clean_python_sources(project_configuration.list_python_packages(), simulate = simulate)
+        self.clean_python_sources(automation_configuration.project_python_elements.package_collection, simulate = simulate)
         logger.debug("")
 
         logger.info("Cleaning python tests")
@@ -44,7 +44,7 @@ class CleanCommand(AutomationCommand):
         logger.debug("")
 
         logger.info("Cleaning automation")
-        self.clean_automation(project_configuration.list_automation_packages(), simulate = simulate)
+        self.clean_automation(automation_configuration.automation_python_package, simulate = simulate)
         logger.debug("")
 
 
@@ -65,9 +65,8 @@ class CleanCommand(AutomationCommand):
         self._clean_pytest_cache(simulate = simulate)
 
 
-    def clean_automation(self, python_package_collection: List[PythonPackage], simulate: bool = False) -> None:
-        for python_package in python_package_collection:
-            self._clean_python_package(python_package, simulate = simulate)
+    def clean_automation(self, python_package: PythonPackage, simulate: bool = False) -> None:
+        self._clean_python_package(python_package, simulate = simulate)
         self._clean_python_cache(os.path.join("Automation", "Setup"), simulate = simulate)
 
 

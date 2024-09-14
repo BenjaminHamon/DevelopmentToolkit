@@ -11,7 +11,7 @@ from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 from bhamon_development_toolkit.python.pylint_runner import PylintRunner
 from bhamon_development_toolkit.python.pylint_scope import PylintScope
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
+from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 
 
 logger = logging.getLogger("Main")
@@ -35,7 +35,7 @@ class LintCommand(AutomationCommand):
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
         run_identifier: Optional[str] = arguments.run_identifier
 
         if run_identifier is None:
@@ -45,7 +45,7 @@ class LintCommand(AutomationCommand):
         pylint_runner = PylintRunner(process_runner, sys.executable)
 
         all_python_scopes: List[PylintScope] = []
-        for python_package in project_configuration.list_python_packages():
+        for python_package in automation_configuration.project_python_elements.package_collection:
             all_python_scopes.append(PylintScope(identifier = python_package.identifier, path_or_module = python_package.name_for_module_import))
 
         result_directory = os.path.join("Artifacts", "LintResults")
