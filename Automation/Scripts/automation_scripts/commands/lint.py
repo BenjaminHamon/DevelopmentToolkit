@@ -36,6 +36,10 @@ class LintCommand(AutomationCommand):
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         project_configuration: ProjectConfiguration = kwargs["configuration"]
+        run_identifier: Optional[str] = arguments.run_identifier
+
+        if run_identifier is None:
+            run_identifier = str(uuid.uuid4())
 
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         pylint_runner = PylintRunner(process_runner, sys.executable)
@@ -43,10 +47,6 @@ class LintCommand(AutomationCommand):
         all_python_scopes: List[PylintScope] = []
         for python_package in project_configuration.list_python_packages():
             all_python_scopes.append(PylintScope(identifier = python_package.identifier, path_or_module = python_package.name_for_module_import))
-
-        run_identifier: Optional[str] = arguments.run_identifier
-        if run_identifier is None:
-            run_identifier = str(uuid.uuid4())
 
         result_directory = os.path.join("Artifacts", "LintResults")
 
