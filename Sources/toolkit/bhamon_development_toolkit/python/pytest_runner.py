@@ -30,7 +30,7 @@ class PytestRunner:
 
     async def run(self, # pylint: disable = too-many-arguments
             all_scopes: List[PytestScope], run_identifier: str, base_result_directory: str,
-            working_directory: Optional[str] = None, simulate: bool = False) -> None:
+            working_directory: Optional[str] = None, check_success: bool = True, simulate: bool = False) -> None:
 
         if len(all_scopes) == 0:
             raise ValueError("all_scopes must not be empty")
@@ -44,24 +44,30 @@ class PytestRunner:
                 shutil.rmtree(result_directory)
             os.makedirs(result_directory)
 
-        session_success = True
+        success: bool = True
+        status: str = "Success"
 
         if not simulate:
             logger.info("")
 
-        for scope in all_scopes:
-            success_for_scope = await self._run_with_scope(scope, result_directory, working_directory = working_directory, simulate = simulate)
-            if not success_for_scope:
-                session_success = False
-            if not simulate:
-                logger.info("")
+        try:
+            for scope in all_scopes:
+                success_for_scope = await self._run_with_scope(scope, result_directory, working_directory = working_directory, simulate = simulate)
+                if not success_for_scope:
+                    success = False
+                    status = "Failure"
+                if not simulate:
+                    logger.info("")
+        except:
+            success = False
+            status = "Exception"
+            raise
+        finally:
+            logger.info("Test session completed (RunIdentifier: '%s', Status: '%s')", run_identifier, status)
+            logger.debug("Result directory: '%s'", result_directory)
 
-        logger.debug("Result directory: '%s'", result_directory)
-
-        if session_success:
-            logger.info("Test session completed successfully (RunIdentifier: '%s')", run_identifier)
-        if not session_success:
-            raise RuntimeError("Test session completed with failures (RunIdentifier: '%s')" % run_identifier)
+        if check_success and not success:
+            raise RuntimeError("Test session did not succeed")
 
 
     async def _run_with_scope(self, # pylint: disable = too-many-locals
