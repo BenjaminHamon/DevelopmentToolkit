@@ -2,9 +2,9 @@ import argparse
 import glob
 import logging
 import os
-import shutil
 from typing import List
 
+from bhamon_development_toolkit.automation import automation_helpers
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 from bhamon_development_toolkit.python.python_package import PythonPackage
 
@@ -53,7 +53,7 @@ class CleanCommand(AutomationCommand):
 
 
     def clean_artifacts(self, artifact_directory: str, simulate: bool = False) -> None:
-        self._remove_directory(artifact_directory, simulate = simulate)
+        automation_helpers.remove_directory(logger, artifact_directory, simulate = simulate)
 
 
     def clean_python_sources(self, python_package_collection: List[PythonPackage], simulate: bool = False) -> None:
@@ -79,10 +79,10 @@ class CleanCommand(AutomationCommand):
         ]
 
         for directory in directories_to_remove:
-            self._remove_directory(directory, simulate = simulate)
+            automation_helpers.remove_directory(logger, directory, simulate = simulate)
 
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
-        self._remove_file(metadata_file_path, simulate = simulate)
+        automation_helpers.remove_file(logger, metadata_file_path, simulate = simulate)
 
         self._clean_python_cache(python_package.path_to_sources, simulate = simulate)
         if python_package.path_to_tests is not None:
@@ -96,25 +96,11 @@ class CleanCommand(AutomationCommand):
         directories_to_remove = glob.glob(os.path.join(source_directory, "**", "__pycache__"), recursive = True)
 
         for directory in directories_to_remove:
-            self._remove_directory(directory, simulate = simulate)
+            automation_helpers.remove_directory(logger, directory, simulate = simulate)
 
 
     def _clean_pytest_cache(self, simulate: bool = False) -> None:
         directories_to_remove = [ ".pytest_cache" ]
 
         for directory in directories_to_remove:
-            self._remove_directory(directory, simulate = simulate)
-
-
-    def _remove_directory(self, directory_to_remove: str, simulate: bool = False) -> None:
-        if os.path.exists(directory_to_remove):
-            logger.debug("Removing '%s'", directory_to_remove)
-            if not simulate:
-                shutil.rmtree(directory_to_remove)
-
-
-    def _remove_file(self, file_to_remove: str, simulate: bool = False) -> None:
-        if os.path.exists(file_to_remove):
-            logger.debug("Removing '%s'", file_to_remove)
-            if not simulate:
-                os.remove(file_to_remove)
+            automation_helpers.remove_directory(logger, directory, simulate = simulate)
