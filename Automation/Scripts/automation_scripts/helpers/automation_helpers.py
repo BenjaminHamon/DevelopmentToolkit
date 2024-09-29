@@ -9,7 +9,6 @@ from bhamon_development_toolkit.revision_control import git_helpers
 # Exposing some helpers from toolkit directly
 from bhamon_development_toolkit.automation.automation_helpers import configure_logging # pylint: disable = unused-import
 from bhamon_development_toolkit.automation.automation_helpers import create_argument_parser # pylint: disable = unused-import
-from bhamon_development_toolkit.automation.automation_helpers import create_command_instance # pylint: disable = unused-import
 
 from automation_scripts.configuration.project_metadata import ProjectMetadata
 

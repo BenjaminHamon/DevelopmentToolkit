@@ -9,6 +9,12 @@ from bhamon_development_toolkit.automation.automation_command import AutomationC
 from automation_scripts.configuration import configuration_manager
 from automation_scripts.helpers import automation_helpers
 
+from automation_scripts.commands.clean_command import CleanCommand
+from automation_scripts.commands.distribution_command import DistributionCommand
+from automation_scripts.commands.info_command import InfoCommand
+from automation_scripts.commands.lint_command import LintCommand
+from automation_scripts.commands.test_command import TestCommand
+
 
 logger = logging.getLogger("Main")
 
@@ -16,7 +22,7 @@ logger = logging.getLogger("Main")
 def main():
     with automation_helpers.execute_in_workspace(__file__):
         configuration = configuration_manager.load_automation_configuration()
-        command_collection = list_commands()
+        command_collection = create_command_collection()
 
         argument_parser = create_argument_parser(command_collection)
         arguments = argument_parser.parse_args()
@@ -32,27 +38,26 @@ def main():
         asyncio_context.run(run_coroutine)
 
 
-def create_argument_parser(command_collection: List[str]) -> argparse.ArgumentParser:
+def create_argument_parser(command_collection: List[AutomationCommand]) -> argparse.ArgumentParser:
     main_parser = automation_helpers.create_argument_parser()
 
     subparsers = main_parser.add_subparsers(title = "commands", metavar = "<command>")
     subparsers.required = True
 
-    for command in command_collection:
-        command_instance = automation_helpers.create_command_instance(command)
+    for command_instance in command_collection:
         command_parser = command_instance.configure_argument_parser(subparsers)
         command_parser.set_defaults(command_instance = command_instance)
 
     return main_parser
 
 
-def list_commands() -> List[str]:
+def create_command_collection() -> List[AutomationCommand]:
     return [
-        "automation_scripts.commands.clean.CleanCommand",
-        "automation_scripts.commands.distribution.DistributionCommand",
-        "automation_scripts.commands.info.InfoCommand",
-        "automation_scripts.commands.lint.LintCommand",
-        "automation_scripts.commands.test.TestCommand",
+        CleanCommand(),
+        DistributionCommand(),
+        InfoCommand(),
+        LintCommand(),
+        TestCommand(),
     ]
 
 
