@@ -229,9 +229,9 @@ class ProcessWatcher: # pylint: disable = too-many-instance-attributes
             except asyncio.CancelledError:
                 pass
             except asyncio.TimeoutError:
-                logger.warning("Task for %s timed out (Executable: '%s', PID: %s)", identifier, self.executable, self.pid)
+                logger.warning("Task '%s' timed out (Executable: '%s', PID: %s)", identifier, self.executable, self.pid)
             except Exception: # pylint: disable = broad-except
-                logger.error("Task for %s raised an unhandled exception (Executable: '%s', PID: %s)", identifier, self.executable, self.pid, exc_info = True)
+                logger.error("Task '%s' raised an unhandled exception (Executable: '%s', PID: %s)", identifier, self.executable, self.pid, exc_info = True)
 
         tasks_to_wait = []
         if self._timeout_task is not None:
