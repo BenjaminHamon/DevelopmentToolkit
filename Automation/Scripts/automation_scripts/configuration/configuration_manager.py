@@ -7,9 +7,8 @@ from bhamon_development_toolkit.revision_control.git_client import GitClient
 
 from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 from automation_scripts.configuration.project_metadata import ProjectMetadata
-from automation_scripts.configuration.project_python_elements import ProjectPythonElements
+from automation_scripts.configuration.python_development_configuration import PythonDevelopmentConfiguration
 from automation_scripts.configuration.workspace_environment import WorkspaceEnvironment
-
 
 
 def load_automation_configuration() -> AutomationConfiguration:
@@ -20,7 +19,7 @@ def load_automation_configuration() -> AutomationConfiguration:
 
     return AutomationConfiguration(
         project_metadata = load_project_metadata(),
-        project_python_elements = load_project_python_elements(),
+        python_development_configuration = load_python_development_configuration(),
         workspace_environment = load_workspace_environment(),
         automation_python_package = automation_python_package,
     )
@@ -57,8 +56,9 @@ def load_project_version(identifier: str) -> ProjectVersion:
     )
 
 
-def load_project_python_elements() -> ProjectPythonElements:
-    return ProjectPythonElements(
+def load_python_development_configuration() -> PythonDevelopmentConfiguration:
+    return PythonDevelopmentConfiguration(
+        venv_directory = ".venv",
         package_collection = [
             PythonPackage(
                 identifier = "bhamon-development-toolkit",

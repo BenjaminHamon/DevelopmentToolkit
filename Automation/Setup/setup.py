@@ -13,8 +13,7 @@ import python_helpers
 logger = logging.getLogger("Main")
 
 
-python_versions = [ "3.9", "3.10", "3.11" ]
-venv_directory = ".venv"
+venv_directory = ".venv-automation"
 
 
 def main() -> None:
@@ -54,20 +53,13 @@ def setup_workspace(verbosity: Optional[str] = None, simulate: bool = False) -> 
     if verbosity is None:
         verbosity = "info"
 
-    logger.info("Setting up local workspace (Path: %s)", os.getcwd())
-
     python_system_executable = python_helpers.resolve_system_python_executable()
     venv_python_executable = python_helpers.get_venv_executable(venv_directory, "python")
+    pip_configuration_file_path = "pip.conf"
+    python_package_collection = [ os.path.join("Automation", "Scripts[dev]") ]
 
-    logger.debug("")
-
-    logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
-    python_helpers.setup_virtual_environment(python_system_executable, venv_directory, simulate = simulate)
-
-    logger.debug("")
-
-    logger.info("Setting up python packages for development")
-    python_package_collection = [ os.path.join("Automation", "Scripts") ] + python_helpers.list_python_packages("Sources")
+    logger.info("Setting up python virtual environment for automation (Path: %s)", venv_directory)
+    python_helpers.setup_virtual_environment(python_system_executable, venv_directory, pip_configuration_file_path, simulate = simulate)
     python_helpers.install_python_packages_for_development(venv_python_executable, python_package_collection, simulate = simulate)
 
 

@@ -1,4 +1,3 @@
-import glob
 import logging
 import os
 import platform
@@ -54,14 +53,6 @@ def _get_pip_configuration_file_path(venv_directory: str) -> str:
     if platform.system() == "Windows":
         return os.path.join(venv_directory, "pip.ini")
     return os.path.join(venv_directory, "pip.conf")
-
-
-def list_python_packages(source_directory: str) -> List[str]:
-    package_collection: List[str] = []
-    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "pyproject.toml")):
-        package_collection.append(os.path.dirname(setup_file_path))
-
-    return package_collection
 
 
 def install_python_packages(python_executable: str, name_or_path_collection: List[str], simulate: bool = False) -> None:
