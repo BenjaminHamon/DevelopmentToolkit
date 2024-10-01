@@ -40,7 +40,7 @@ class PythonEnvironment:
         return os.path.join(self._venv_directory, "pip.conf")
 
 
-    def setup_virtual_environment(self, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
+    async def setup_virtual_environment(self, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
         venv_python_executable = self.get_venv_python_executable()
         if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
             raise RuntimeError("Active python is the target virtual environment")
@@ -54,26 +54,26 @@ class PythonEnvironment:
         venv_command = ExecutableCommand(self._system_python_executable)
         venv_command.add_arguments([ "-m", "venv", self._venv_directory ])
 
-        process_helpers.run_simple(logger, venv_command, simulate = simulate)
+        await process_helpers.run_simple_async(logger, venv_command, simulate = simulate)
 
         if pip_configuration_file_path is not None:
             pip_configuration_file_path_in_venv = self._get_pip_configuration_file_path()
             if not simulate:
                 shutil.copy(pip_configuration_file_path, pip_configuration_file_path_in_venv)
 
-        self.install_python_packages([ "pip", "wheel" ], simulate = simulate)
+        await self.install_python_packages([ "pip", "wheel" ], simulate = simulate)
 
 
-    def install_python_packages(self,
+    async def install_python_packages(self,
             name_or_path_collection: List[str], simulate: bool = False) -> None:
 
         install_command = ExecutableCommand(self.get_venv_python_executable())
         install_command.add_arguments([ "-m", "pip", "install", "--upgrade" ] + name_or_path_collection)
 
-        process_helpers.run_simple(logger, install_command, simulate = simulate)
+        await process_helpers.run_simple_async(logger, install_command, simulate = simulate)
 
 
-    def install_python_packages_for_development(self,
+    async def install_python_packages_for_development(self,
             name_or_path_collection: List[str], simulate: bool = False) -> None:
 
         def is_local_package(name_or_path: str) -> bool:
@@ -85,4 +85,4 @@ class PythonEnvironment:
         for name_or_path in name_or_path_collection:
             install_command.add_arguments([ "--editable", name_or_path ] if is_local_package(name_or_path) else [ name_or_path ])
 
-        process_helpers.run_simple(logger, install_command, simulate = simulate)
+        await process_helpers.run_simple_async(logger, install_command, simulate = simulate)
