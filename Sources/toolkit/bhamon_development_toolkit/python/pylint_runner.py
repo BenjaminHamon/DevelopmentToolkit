@@ -6,6 +6,7 @@ from typing import List, Optional
 from bhamon_development_toolkit.processes import process_helpers
 from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
 from bhamon_development_toolkit.processes.process_options import ProcessOptions
+from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
 from bhamon_development_toolkit.processes.process_output_logger import ProcessOutputLogger
 from bhamon_development_toolkit.processes.process_result import ProcessResult
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
@@ -26,12 +27,12 @@ class PylintRunner:
 
     async def run(self, # pylint: disable = too-many-arguments
             all_scopes: List[PylintScope], run_identifier: str, base_result_directory: str,
-            working_directory: Optional[str] = None, simulate: bool = False) -> None:
+            working_directory: Optional[str] = None, check_success: bool = True, simulate: bool = False) -> None:
 
         if len(all_scopes) == 0:
             raise ValueError("all_scopes must not be empty")
 
-        logger.info("Running linter (RunIdentifier: '%s')", run_identifier)
+        logger.info("Lint session starting (RunIdentifier: '%s')", run_identifier)
 
         result_directory = os.path.join(base_result_directory, run_identifier)
 
@@ -40,19 +41,30 @@ class PylintRunner:
                 shutil.rmtree(result_directory)
             os.makedirs(result_directory)
 
-        session_success = True
+        success: bool = True
+        status: str = "Success"
 
-        for scope in all_scopes:
-            success_for_scope = await self._run_with_scope(scope, result_directory, working_directory = working_directory, simulate = simulate)
-            if not success_for_scope:
-                session_success = False
+        if not simulate:
+            logger.info("")
 
-        logger.debug("Result directory: '%s'", result_directory)
+        try:
+            for scope in all_scopes:
+                success_for_scope = await self._run_with_scope(scope, result_directory, working_directory = working_directory, simulate = simulate)
+                if not success_for_scope:
+                    success = False
+                    status = "Failure"
+                if not simulate:
+                    logger.info("")
+        except:
+            success = False
+            status = "Exception"
+            raise
+        finally:
+            logger.info("Lint session completed (RunIdentifier: '%s', Status: '%s')", run_identifier, status)
+            logger.debug("Result directory: '%s'", result_directory)
 
-        if session_success:
-            logger.info("Pylint session completed successfully")
-        if not session_success:
-            raise RuntimeError("Pylint session completed with issues")
+        if check_success and not success:
+            raise RuntimeError("Lint session did not succeed")
 
 
     async def _run_with_scope(self,
@@ -70,16 +82,21 @@ class PylintRunner:
         raw_logger = process_helpers.create_raw_logger(log_file_path = log_file_path)
         process_output_logger = ProcessOutputLogger(raw_logger.get_actual_logger())
         pylint_output_handler = PylintOutputHandler()
+        output_handlers: List[ProcessOutputHandler] = [ process_output_logger, pylint_output_handler ]
 
         command.add_internal_arguments([ "--msg-template", pylint_output_handler.get_message_template() ], [])
 
-        logger.info("+ %s", process_helpers.format_executable_command(command.get_command_for_logging()))
+        logger.info("Running linter (Package: '%s')", scope.identifier)
+        logger.debug("+ %s", process_helpers.format_executable_command(command.get_command_for_logging()))
 
         success = True
 
         try:
             if not simulate:
-                result = await self._process_runner.run(command, process_options, [ process_output_logger, pylint_output_handler ], check_exit_code = False)
+                try:
+                    result = await self._process_runner.run(command, process_options, output_handlers, check_exit_code = False)
+                finally:
+                    logger.debug("Process log file: '%s'", log_file_path)
             else:
                 result = ProcessResult(executable = self._python_executable, exit_code = 0)
         finally:
@@ -87,6 +104,8 @@ class PylintRunner:
 
         self._check_exit_code(result.exit_code)
         success = self._get_success_from_exit_code(result.exit_code)
+
+        logger.debug("Report file: '%s'", json_report_file_path)
 
         return success
 

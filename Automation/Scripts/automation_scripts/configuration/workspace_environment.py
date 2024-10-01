@@ -1,4 +1,4 @@
-class ProjectEnvironment:
+class WorkspaceEnvironment:
 
 
     def get_python_package_repository_url(self, target_environment: str) -> str:
