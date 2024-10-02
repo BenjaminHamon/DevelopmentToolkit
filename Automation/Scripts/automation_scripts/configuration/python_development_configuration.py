@@ -1,8 +1,9 @@
 from typing import List
 
-from automation_scripts.configuration.project_metadata import ProjectMetadata
 from bhamon_development_toolkit.python.python_package import PythonPackage
 from bhamon_development_toolkit.python.python_package_metadata import PythonPackageMetadata
+
+from automation_scripts.configuration.project_metadata import ProjectMetadata
 
 
 class PythonDevelopmentConfiguration:
