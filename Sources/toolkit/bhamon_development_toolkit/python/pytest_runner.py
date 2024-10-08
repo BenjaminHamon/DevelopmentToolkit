@@ -90,7 +90,7 @@ class PytestRunner:
         pytest_output_handler = PytestOutputHandler(scope)
         output_handlers: List[ProcessOutputHandler] = [ process_output_logger, pytest_output_handler ]
 
-        logger.info("Running tests (Package: '%s', Filter: '%s')", scope.identifier, scope.filter_expression)
+        logger.info("Running tests (Scope: '%s', Filter: '%s')", scope.identifier, scope.filter_expression)
         logger.debug("+ %s", process_helpers.format_executable_command(command.get_command_for_logging()))
 
         success = True

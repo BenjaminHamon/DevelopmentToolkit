@@ -86,7 +86,7 @@ class PylintRunner:
 
         command.add_internal_arguments([ "--msg-template", pylint_output_handler.get_message_template() ], [])
 
-        logger.info("Running linter (Package: '%s')", scope.identifier)
+        logger.info("Running linter (Scope: '%s')", scope.identifier)
         logger.debug("+ %s", process_helpers.format_executable_command(command.get_command_for_logging()))
 
         success = True
