@@ -1,4 +1,3 @@
-import glob
 import logging
 import os
 import platform
@@ -18,7 +17,7 @@ def resolve_system_python_executable() -> str:
     raise RuntimeError("Unable to resolve the system Python executable")
 
 
-def setup_virtual_environment(
+async def setup_virtual_environment(
         system_python_executable: str, venv_directory: str, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
     venv_python_executable = get_venv_executable(venv_directory, "python")
@@ -34,14 +33,14 @@ def setup_virtual_environment(
     venv_command = [ system_python_executable ]
     venv_command += [ "-m", "venv", venv_directory ]
 
-    process_helpers.run_simple(logger, venv_command, simulate = simulate)
+    await process_helpers.run_simple_async(logger, venv_command, simulate = simulate)
 
     if pip_configuration_file_path is not None:
         pip_configuration_file_path_in_venv = _get_pip_configuration_file_path(venv_directory)
         if not simulate:
             shutil.copy(pip_configuration_file_path, pip_configuration_file_path_in_venv)
 
-    install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
+    await install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
 
 
 def get_venv_executable(venv_directory: str, executable: str) -> str:
@@ -56,22 +55,14 @@ def _get_pip_configuration_file_path(venv_directory: str) -> str:
     return os.path.join(venv_directory, "pip.conf")
 
 
-def list_python_packages(source_directory: str) -> List[str]:
-    package_collection: List[str] = []
-    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "pyproject.toml")):
-        package_collection.append(os.path.dirname(setup_file_path))
-
-    return package_collection
-
-
-def install_python_packages(python_executable: str, name_or_path_collection: List[str], simulate: bool = False) -> None:
+async def install_python_packages(python_executable: str, name_or_path_collection: List[str], simulate: bool = False) -> None:
     install_command = [ python_executable ]
     install_command += [ "-m", "pip", "install", "--upgrade" ] + name_or_path_collection
 
-    process_helpers.run_simple(logger, install_command, simulate = simulate)
+    await process_helpers.run_simple_async(logger, install_command, simulate = simulate)
 
 
-def install_python_packages_for_development(python_executable: str,name_or_path_collection: List[str], simulate: bool = False) -> None:
+async def install_python_packages_for_development(python_executable: str,name_or_path_collection: List[str], simulate: bool = False) -> None:
 
     def is_local_package(name_or_path: str) -> bool:
         return name_or_path.startswith(".") or "/" in name_or_path or "\\" in name_or_path
@@ -82,4 +73,4 @@ def install_python_packages_for_development(python_executable: str,name_or_path_
     for name_or_path in name_or_path_collection:
         install_command += [ "--editable", name_or_path ] if is_local_package(name_or_path) else [ name_or_path ]
 
-    process_helpers.run_simple(logger, install_command, simulate = simulate)
+    await process_helpers.run_simple_async(logger, install_command, simulate = simulate)

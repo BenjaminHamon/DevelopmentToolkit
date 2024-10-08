@@ -20,6 +20,7 @@ __pycache__/
 *.pyc
 
 # Python virtual environment
+.venv-automation/
 .venv/
 
 # Visual Studio Code

@@ -10,6 +10,7 @@ from automation_scripts.configuration import configuration_manager
 from automation_scripts.helpers import automation_helpers
 
 from automation_scripts.commands.clean_command import CleanCommand
+from automation_scripts.commands.develop_command import DevelopCommand
 from automation_scripts.commands.distribution_command import DistributionCommand
 from automation_scripts.commands.info_command import InfoCommand
 from automation_scripts.commands.lint_command import LintCommand
@@ -54,6 +55,7 @@ def create_argument_parser(command_collection: List[AutomationCommand]) -> argpa
 def create_command_collection() -> List[AutomationCommand]:
     return [
         CleanCommand(),
+        DevelopCommand(),
         DistributionCommand(),
         InfoCommand(),
         LintCommand(),

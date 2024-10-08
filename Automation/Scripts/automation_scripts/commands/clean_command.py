@@ -36,7 +36,7 @@ class CleanCommand(AutomationCommand):
         logger.debug("")
 
         logger.info("Cleaning python sources")
-        self.clean_python_sources(automation_configuration.project_python_elements.package_collection, simulate = simulate)
+        self.clean_python_sources(automation_configuration.python_development_configuration.package_collection, simulate = simulate)
         logger.debug("")
 
         logger.info("Cleaning python tests")

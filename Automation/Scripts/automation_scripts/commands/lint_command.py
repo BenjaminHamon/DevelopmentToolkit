@@ -1,15 +1,17 @@
 import argparse
 import logging
 import os
-import sys
-from typing import List, Optional
 import uuid
+from typing import List, Optional
 
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
+from bhamon_development_toolkit.python import python_helpers
 from bhamon_development_toolkit.python.pylint_runner import PylintRunner
 from bhamon_development_toolkit.python.pylint_scope import PylintScope
+from bhamon_development_toolkit.python.python_environment import PythonEnvironment
+from bhamon_development_toolkit.python.python_package import PythonPackage
 
 from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 
@@ -41,13 +43,31 @@ class LintCommand(AutomationCommand):
         if run_identifier is None:
             run_identifier = str(uuid.uuid4())
 
+        venv_directory = automation_configuration.python_development_configuration.venv_directory
+        python_system_executable = python_helpers.resolve_system_python_executable()
+        python_environment = PythonEnvironment(python_system_executable, venv_directory)
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
-        pylint_runner = PylintRunner(process_runner, sys.executable)
+        pylint_runner = PylintRunner(process_runner, python_environment.get_venv_python_executable())
 
         all_python_scopes: List[PylintScope] = []
-        for python_package in automation_configuration.project_python_elements.package_collection:
-            all_python_scopes.append(PylintScope(identifier = python_package.identifier, path_or_module = python_package.name_for_module_import))
+        for python_package in automation_configuration.python_development_configuration.package_collection:
+            all_python_scopes.extend(get_scopes(python_package))
 
         result_directory = os.path.join("Artifacts", "LintResults")
 
         await pylint_runner.run(all_python_scopes, run_identifier, result_directory, simulate = simulate)
+
+
+def get_scopes(python_package: PythonPackage) -> List[PylintScope]:
+    scopes_for_package: List[PylintScope] = []
+
+    scopes_for_package.append(PylintScope(
+        identifier = python_package.identifier,
+        path_or_module = os.path.join(python_package.path_to_sources, python_package.name_for_file_system)))
+
+    if python_package.path_to_tests is not None:
+        scopes_for_package.append(PylintScope(
+            identifier = python_package.identifier + "-tests",
+            path_or_module = os.path.join(python_package.path_to_tests, python_package.name_for_file_system + "_tests" )))
+
+    return scopes_for_package

@@ -58,8 +58,8 @@ class _SetupCommand(AutomationCommand):
         python_package_builder = PythonPackageBuilder(python_executable, process_runner)
 
         logger.info("Generating python package metadata")
-        python_package_metadata = automation_configuration.project_python_elements.get_python_package_metadata(automation_configuration.project_metadata)
-        for python_package in automation_configuration.project_python_elements.package_collection:
+        python_package_metadata = automation_configuration.python_development_configuration.get_package_metadata(automation_configuration.project_metadata)
+        for python_package in automation_configuration.python_development_configuration.package_collection:
             python_package_builder.generate_package_metadata(python_package, python_package_metadata, simulate = simulate)
 
 
@@ -90,7 +90,7 @@ class _PackageCommand(AutomationCommand):
         python_package_builder = PythonPackageBuilder(python_executable, process_runner)
 
         logger.info("Building python distribution packages")
-        for python_package in automation_configuration.project_python_elements.package_collection:
+        for python_package in automation_configuration.python_development_configuration.package_collection:
             output_directory = os.path.join("Artifacts", "Distributions", python_package.identifier)
             custom_settings = { "version": automation_configuration.project_metadata.version.full_identifier }
             log_file_path = os.path.join("Artifacts", "Logs", "BuildDistributionPackage_%s.log" % python_package.identifier)
@@ -122,7 +122,7 @@ class _UploadCommand(AutomationCommand):
         python_distribution_manager = _create_distribution_manager(python_executable, package_repository_url)
 
         logger.info("Uploading python distribution packages")
-        for python_package in automation_configuration.project_python_elements.package_collection:
+        for python_package in automation_configuration.python_development_configuration.package_collection:
             archive_name = python_package.name_for_file_system + "-" + version
             package_path = os.path.join(distribution_directory, python_package.identifier, archive_name + "-py3-none-any.whl")
             python_distribution_manager.upload_package(package_path, simulate = simulate)
@@ -158,7 +158,7 @@ class _UploadForReleaseCommand(AutomationCommand):
         python_distribution_manager = _create_distribution_manager(python_executable, package_repository_url)
 
         logger.info("Uploading python distribution packages")
-        for python_package in automation_configuration.project_python_elements.package_collection:
+        for python_package in automation_configuration.python_development_configuration.package_collection:
             python_package_builder.copy_distribution_package_for_release(
                 python_package, version, version_for_release, os.path.join(distribution_directory, python_package.identifier), simulate = simulate)
 

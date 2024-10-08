@@ -3,6 +3,7 @@
 # cspell:words pycache venv
 
 ignorePaths:
+  - ".venv-automation/**"
   - ".venv/**"
   - "**/__pycache__/**"
   - "**/*.egg-info/**"
