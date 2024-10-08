@@ -50,4 +50,4 @@ dev = [
 "Source" = "https://github.com/BenjaminHamon/DevelopmentToolkit"
 
 [tool.setuptools]
-license-files = [ "../../license.txt" ]
+license-files = [ "../../About.md", "../../License.txt" ]
