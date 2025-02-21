@@ -93,13 +93,11 @@ class PylintRunner:
 
         try:
             if not simulate:
-                try:
-                    result = await self._process_runner.run(command, process_options, output_handlers, check_exit_code = False)
-                finally:
-                    logger.debug("Process log file: '%s'", log_file_path)
+                result = await self._process_runner.run(command, process_options, output_handlers, check_exit_code = False)
             else:
                 result = ProcessResult(executable = self._python_executable, exit_code = 0)
         finally:
+            logger.debug("Process log file: '%s'", log_file_path)
             raw_logger.dispose()
 
         self._check_exit_code(result.exit_code)

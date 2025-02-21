@@ -68,6 +68,7 @@ class PyInstallerRunner:
         finally:
             if log_file_path is not None:
                 logger.debug("Process log file: '%s'", log_file_path)
+            raw_logger.dispose()
 
         logger.debug("Application executable path: '%s'", executable_path)
 

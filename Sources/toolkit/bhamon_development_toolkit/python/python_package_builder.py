@@ -67,6 +67,8 @@ class PythonPackageBuilder:
                 os.makedirs(output_directory, exist_ok = True) # Pip creates the output directory but use lowercase for some reason
                 await self._process_runner.run(setup_command, process_options, output_handlers, check_exit_code = True)
         finally:
+            if log_file_path is not None:
+                logger.debug("Process log file: '%s'", log_file_path)
             raw_logger.dispose()
 
         filename_regex = r" filename=(" + re.escape(python_package.name_for_file_system) + r"-[0-9a-zA-Z\.\-\+]+-py3-none-any.whl) "
@@ -77,8 +79,6 @@ class PythonPackageBuilder:
             output_path = os.path.join(output_directory, filename_match.group(1))
 
         logger.debug("Distribution package path: '%s'", output_path)
-        if log_file_path is not None:
-            logger.debug("Process log file: '%s'", log_file_path)
 
 
     async def build_distribution_package_with_custom_settings(self, # pylint: disable = too-many-arguments
