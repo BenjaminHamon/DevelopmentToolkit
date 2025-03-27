@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bhamon-development-toolkit"
-version = "3.0.0+development"
+version = "3.1.0+development"
 description = "Toolkit for automating software development tasks"
 requires-python = ">= 3.9"
 

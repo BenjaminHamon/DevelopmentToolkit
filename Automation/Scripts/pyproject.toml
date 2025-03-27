@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "automation-scripts"
-version = "3.0.0+development"
+version = "3.1.0+development"
 description = "Automation scripts for the local project"
 requires-python = ">= 3.9"
 
