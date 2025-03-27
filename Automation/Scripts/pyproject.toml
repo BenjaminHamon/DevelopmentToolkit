@@ -11,16 +11,8 @@ description = "Automation scripts for the local project"
 requires-python = ">= 3.9"
 
 dependencies = [
-    "bhamon-development-toolkit ~= 3.0.1",
-]
-
-[project.optional-dependencies]
-dev = [
-    "mockito ~= 1.5.0",
-    "pylint ~= 3.2.6",
-    "pytest ~= 8.3.2",
-    "pytest-asyncio ~= 0.24.0",
-    "pytest-json ~= 0.4.0",
+    "bhamon-development-toolkit[python] == 3.1.0+development",
+    "mockito ~= 1.5.4",
 ]
 
 [project.scripts]
