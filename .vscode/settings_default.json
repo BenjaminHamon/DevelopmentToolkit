@@ -1,4 +1,6 @@
 {
+	// cspell:words isort pytest venv
+
 	"$schema": "./schema.json",
 
 	"files.exclude": {
