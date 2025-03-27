@@ -39,13 +39,15 @@ class PythonPackageRepositoryFileClient:
         return next((x for x in glob.glob(os.path.join(self.server_path, distribution, distribution_pattern))), None)
 
 
-    def create_directory(self, distribution, simulate = False):
+    def create_directory(self, distribution, *, simulate = False):
         directory_path = os.path.join(self.server_path, distribution)
         if not simulate:
             os.makedirs(directory_path, exist_ok = True)
 
 
-    def upload(self, local_directory, distribution, version, file_extension, simulate = False): # pylint: disable = too-many-arguments
+    def upload(self, # pylint: disable = too-many-arguments
+            local_directory, distribution, version, file_extension, *, simulate = False):
+
         logger.info("Uploading distribution '%s' to repository '%s'", distribution, self.server_path)
 
         archive_name = distribution.replace("-", "_") + "-" + version["full"]
@@ -110,7 +112,9 @@ class PythonPackageRepositorySshClient:
                 raise RuntimeError("Failed to create directory: '%s'" % distribution)
 
 
-    def upload(self, local_directory, distribution, version, file_extension, simulate = False): # pylint: disable = too-many-arguments
+    def upload(self, # pylint: disable = too-many-arguments
+            local_directory, distribution, version, file_extension, *, simulate = False):
+
         logger.info("Uploading distribution '%s' to repository '%s'", distribution, "ssh://" + self.server_host + ":" + self.server_path)
 
         archive_name = distribution.replace("-", "_") + "-" + version["full"]

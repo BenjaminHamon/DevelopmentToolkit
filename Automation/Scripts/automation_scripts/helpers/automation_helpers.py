@@ -23,7 +23,7 @@ def execute_in_workspace(script_path: str) -> Generator[None,None,None]:
         yield
 
 
-def log_script_information(project_metadata: ProjectMetadata, simulate: bool = False) -> None:
+def log_script_information(project_metadata: ProjectMetadata, *, simulate: bool = False) -> None:
     if simulate:
         logger.info("(( The script is running as a simulation ))")
         logger.info("")

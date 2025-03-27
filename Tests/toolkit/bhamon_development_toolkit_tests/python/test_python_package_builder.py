@@ -26,7 +26,8 @@ async def test_build_distribution_package(tmpdir):
     python_package = PythonPackage("my-test-package", os.path.join(tmpdir, "sources"), os.path.join(tmpdir, "tests"))
     output_directory = os.path.join(tmpdir, "output")
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = True) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = True) \
         .thenReturn(mock_future(ProcessResult(executable = "FakePython", exit_code = 0)))
 
     await builder.build_distribution_package(python_package, output_directory, simulate = False)

@@ -18,7 +18,8 @@ def resolve_system_python_executable() -> str:
 
 
 async def setup_virtual_environment(
-        system_python_executable: str, venv_directory: str, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
+        system_python_executable: str, venv_directory: str, *,
+        pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
     venv_python_executable = get_venv_executable(venv_directory, "python")
     if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
@@ -55,14 +56,17 @@ def _get_pip_configuration_file_path(venv_directory: str) -> str:
     return os.path.join(venv_directory, "pip.conf")
 
 
-async def install_python_packages(python_executable: str, name_or_path_collection: List[str], simulate: bool = False) -> None:
+async def install_python_packages(
+        python_executable: str, name_or_path_collection: List[str], *, simulate: bool = False) -> None:
+
     install_command = [ python_executable ]
     install_command += [ "-m", "pip", "install", "--upgrade" ] + name_or_path_collection
 
     await process_helpers.run_simple_async(logger, install_command, simulate = simulate)
 
 
-async def install_python_packages_for_development(python_executable: str,name_or_path_collection: List[str], simulate: bool = False) -> None:
+async def install_python_packages_for_development(
+        python_executable: str, name_or_path_collection: List[str], *, simulate: bool = False) -> None:
 
     def is_local_package(name_or_path: str) -> bool:
         return name_or_path.startswith(".") or "/" in name_or_path or "\\" in name_or_path

@@ -19,7 +19,7 @@ class PythonTwineDistributionManager:
         self.password: Optional[str] = None
 
 
-    def upload_package(self, package_path: str, simulate: bool = False) -> None:
+    def upload_package(self, package_path: str, *, simulate: bool = False) -> None:
         if self.username is None:
             raise ValueError("Username is required")
         if self.password is None:

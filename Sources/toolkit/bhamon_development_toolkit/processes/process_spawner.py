@@ -20,7 +20,7 @@ logger = logging.getLogger("ProcessSpawner")
 class ProcessSpawner:
 
 
-    def __init__(self, is_console: bool = False) -> None:
+    def __init__(self, *, is_console: bool = False) -> None:
         self.termination_signal: signal.Signals = signal.SIGTERM
         self.subprocess_flags: int = 0
 

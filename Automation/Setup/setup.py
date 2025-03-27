@@ -25,7 +25,7 @@ def main() -> None:
         asyncio_context.run(run_coroutine)
 
 
-async def setup_workspace(simulate: bool = False) -> None:
+async def setup_workspace(*, simulate: bool = False) -> None:
     venv_directory = ".venv-automation"
     pip_configuration_file_path = "pip.conf"
 
@@ -34,7 +34,8 @@ async def setup_workspace(simulate: bool = False) -> None:
     python_package_collection = [ os.path.join("Automation", "Scripts[dev]") ]
 
     logger.info("Setting up python virtual environment for automation (Path: %s)", venv_directory)
-    await python_helpers.setup_virtual_environment(python_system_executable, venv_directory, pip_configuration_file_path, simulate = simulate)
+    await python_helpers.setup_virtual_environment(
+        python_system_executable, venv_directory, pip_configuration_file_path = pip_configuration_file_path, simulate = simulate)
     await python_helpers.install_python_packages_for_development(venv_python_executable, python_package_collection, simulate = simulate)
 
 

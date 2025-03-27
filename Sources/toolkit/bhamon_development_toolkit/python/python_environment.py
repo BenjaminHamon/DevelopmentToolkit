@@ -40,7 +40,9 @@ class PythonEnvironment:
         return os.path.join(self._venv_directory, "pip.conf")
 
 
-    async def setup_virtual_environment(self, pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
+    async def setup_virtual_environment(self, *,
+            pip_configuration_file_path: Optional[str] = None, simulate: bool = False) -> None:
+
         venv_python_executable = self.get_venv_python_executable()
         if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
             raise RuntimeError("Active python is the target virtual environment")
@@ -65,7 +67,7 @@ class PythonEnvironment:
 
 
     async def install_python_packages(self,
-            name_or_path_collection: List[str], simulate: bool = False) -> None:
+            name_or_path_collection: List[str], *, simulate: bool = False) -> None:
 
         install_command = ExecutableCommand(self.get_venv_python_executable())
         install_command.add_arguments([ "-m", "pip", "install", "--upgrade" ] + name_or_path_collection)
@@ -74,7 +76,7 @@ class PythonEnvironment:
 
 
     async def install_python_packages_for_development(self,
-            name_or_path_collection: List[str], simulate: bool = False) -> None:
+            name_or_path_collection: List[str], *, simulate: bool = False) -> None:
 
         def is_local_package(name_or_path: str) -> bool:
             return name_or_path.startswith(".") or "/" in name_or_path or "\\" in name_or_path

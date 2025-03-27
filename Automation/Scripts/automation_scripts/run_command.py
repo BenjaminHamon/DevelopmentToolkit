@@ -31,7 +31,7 @@ def main():
 
         automation_helpers.configure_logging(arguments)
 
-        automation_helpers.log_script_information(configuration.project_metadata, arguments.simulate)
+        automation_helpers.log_script_information(configuration.project_metadata, simulate = arguments.simulate)
         command_instance.check_requirements(arguments, configuration = configuration)
         run_coroutine = command_instance.run_async(arguments, configuration = configuration, simulate = arguments.simulate)
 

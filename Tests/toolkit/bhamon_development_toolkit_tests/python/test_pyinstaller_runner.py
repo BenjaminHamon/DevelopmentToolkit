@@ -35,7 +35,8 @@ async def test_run(tmpdir):
     output_directory = os.path.join(tmpdir, "Output")
     intermediate_directory = os.path.join(tmpdir, "Output-Intermediate")
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = True) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = True) \
         .thenReturn(mock_future(ProcessResult("FakePyInstaller", 0)))
 
     await pyinstaller_runner.run(configuration, output_directory, intermediate_directory)

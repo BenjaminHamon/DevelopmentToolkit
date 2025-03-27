@@ -28,7 +28,7 @@ def main() -> None:
         asyncio_context.run(run_coroutine)
 
 
-async def run_checks(simulate: bool = False) -> None:
+async def run_checks(*, simulate: bool = False) -> None:
     venv_directory = ".venv-automation"
     pylint_executable = python_helpers.get_venv_executable(venv_directory, "pylint")
     pytest_executable = python_helpers.get_venv_executable(venv_directory, "pytest")

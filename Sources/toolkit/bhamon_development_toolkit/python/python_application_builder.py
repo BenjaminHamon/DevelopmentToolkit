@@ -21,7 +21,7 @@ class PythonApplicationBuilder:
 
 
     async def build_application(self, # pylint: disable = too-many-arguments
-            application_source_file_path: str, executable_name: str, output_directory: str, intermediate_directory: str,
+            application_source_file_path: str, executable_name: str, output_directory: str, intermediate_directory: str, *,
             application_metadata: Optional[ApplicationMetadata] = None, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         pyinstaller_configuration = PyInstallerConfiguration(

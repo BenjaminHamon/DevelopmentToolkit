@@ -11,10 +11,12 @@ class FakeProcess(Process):
     def __init__(self, # pylint: disable = too-many-arguments
             pid: int,
             execution_duration: datetime.timedelta,
+            *,
             stdout: Optional[asyncio.StreamReader] = None,
             stderr: Optional[asyncio.StreamReader] = None,
             exit_code_for_normal_completion: int = 0,
-            allow_termination: bool = True) -> None:
+            allow_termination: bool = True,
+        ) -> None:
 
         self._pid = pid
         self._stdout = stdout

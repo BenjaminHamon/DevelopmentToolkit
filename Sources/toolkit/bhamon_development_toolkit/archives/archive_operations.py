@@ -31,7 +31,7 @@ class ArchiveOperations(abc.ABC):
 
     @abc.abstractmethod
     def extract(self, # pylint: disable = too-many-arguments
-            archive_path: str, output_directory: str,
+            archive_path: str, output_directory: str, *,
             extraction_directory: Optional[str] = None,
             file_collection: Optional[List[str]] = None,
             replace: bool = False, simulate: bool = False) -> None:

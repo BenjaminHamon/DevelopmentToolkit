@@ -28,7 +28,7 @@ class PythonPackageBuilder:
 
 
     def generate_package_metadata(self,
-            python_package: PythonPackage, python_package_metadata: PythonPackageMetadata, simulate: bool = False) -> None:
+            python_package: PythonPackage, python_package_metadata: PythonPackageMetadata, *, simulate: bool = False) -> None:
 
         metadata_file_path = os.path.join(python_package.path_to_sources, python_package.name_for_file_system, "__metadata__.py")
 
@@ -49,7 +49,8 @@ class PythonPackageBuilder:
 
 
     async def build_distribution_package(self,
-            python_package: PythonPackage, output_directory: str, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
+            python_package: PythonPackage, output_directory: str, *,
+            log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         setup_command = ExecutableCommand(self._python_executable)
         setup_command.add_arguments([ "-m", "pip", "wheel", "--no-deps", "--wheel-dir", output_directory, python_package.path_to_sources ])
@@ -65,7 +66,7 @@ class PythonPackageBuilder:
         try:
             if not simulate:
                 os.makedirs(output_directory, exist_ok = True) # Pip creates the output directory but use lowercase for some reason
-                await self._process_runner.run(setup_command, process_options, output_handlers, check_exit_code = True)
+                await self._process_runner.run(setup_command, process_options, output_handlers = output_handlers, check_exit_code = True)
         finally:
             if log_file_path is not None:
                 logger.debug("Process log file: '%s'", log_file_path)
@@ -82,7 +83,7 @@ class PythonPackageBuilder:
 
 
     async def build_distribution_package_with_custom_settings(self, # pylint: disable = too-many-arguments
-            python_package: PythonPackage, output_directory: str, settings_dictionary: Dict[str,str],
+            python_package: PythonPackage, output_directory: str, settings_dictionary: Dict[str,str], *,
             log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         pyproject_toml_file_path = os.path.join(python_package.path_to_sources, "pyproject.toml")
@@ -110,8 +111,8 @@ class PythonPackageBuilder:
             os.replace(pyproject_toml_file_path + ".tmp", pyproject_toml_file_path)
 
 
-    def copy_distribution_package_for_release(self, # pylint: disable = too-many-arguments
-            python_package: PythonPackage, version: str, version_for_release: str, distribution_directory: str, simulate: bool = False) -> None:
+    def copy_distribution_package_for_release(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            python_package: PythonPackage, version: str, version_for_release: str, distribution_directory: str, *, simulate: bool = False) -> None:
 
         archive_name = python_package.name_for_file_system + "-" + version
         archive_name_for_release = python_package.name_for_file_system + "-" + version_for_release

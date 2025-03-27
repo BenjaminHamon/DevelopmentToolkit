@@ -41,7 +41,7 @@ async def test_run_with_success(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     working_directory = str(tmpdir)
 
-    await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory)
+    await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)
 
 
 @pytest.mark.asyncio
@@ -62,7 +62,7 @@ async def test_run_with_failure(tmpdir):
     working_directory = str(tmpdir)
 
     with pytest.raises(RuntimeError):
-        await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory)
+        await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)
 
 
 @pytest.mark.asyncio
@@ -80,4 +80,4 @@ async def test_run_with_no_tests(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     working_directory = str(tmpdir)
 
-    await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory)
+    await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)

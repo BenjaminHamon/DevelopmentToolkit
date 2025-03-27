@@ -36,7 +36,7 @@ class ArchiveOperationsBase(ArchiveOperations):
 
 
     def extract(self, # pylint: disable = too-many-arguments
-            archive_path: str, output_directory: str,
+            archive_path: str, output_directory: str, *,
             extraction_directory: Optional[str] = None,
             file_collection: Optional[List[str]] = None,
             replace: bool = False, simulate: bool = False) -> None:
@@ -55,7 +55,7 @@ class ArchiveOperationsBase(ArchiveOperations):
 
 
     def _apply_extraction_changes(self, # pylint: disable = too-many-arguments
-            output_directory: str, extraction_directory: str, file_collection: List[str], replace: bool = False, simulate: bool = False) -> None:
+            output_directory: str, extraction_directory: str, file_collection: List[str], *, replace: bool = False, simulate: bool = False) -> None:
 
         if replace and os.path.isdir(output_directory):
             logger.debug("Removing existing files from '%s'", output_directory)
@@ -87,5 +87,5 @@ class ArchiveOperationsBase(ArchiveOperations):
 
 
     @abc.abstractmethod
-    def _extract_implementation(self, archive_path: str, extraction_directory: str, file_collection: List[str], simulate: bool = False) -> None:
+    def _extract_implementation(self, archive_path: str, extraction_directory: str, file_collection: List[str], *, simulate: bool = False) -> None:
         pass

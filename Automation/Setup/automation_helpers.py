@@ -95,7 +95,7 @@ def get_current_revision() -> str:
     return git_command_result.stdout.strip()
 
 
-def log_script_information(configuration: dict, simulate: bool = False) -> None:
+def log_script_information(configuration: dict, *, simulate: bool = False) -> None:
     logger = logging.getLogger("Main")
 
     if simulate:

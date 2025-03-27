@@ -78,14 +78,14 @@ def create_command_instance(class_fully_qualified_name: str) -> AutomationComman
     return command_instance
 
 
-def remove_directory(logger: logging.Logger, directory_to_remove: str, simulate: bool = False) -> None:
+def remove_directory(logger: logging.Logger, directory_to_remove: str, *, simulate: bool = False) -> None:
     if os.path.exists(directory_to_remove):
         logger.debug("Removing '%s'", directory_to_remove)
         if not simulate:
             shutil.rmtree(directory_to_remove)
 
 
-def remove_file(logger: logging.Logger, file_to_remove: str, simulate: bool = False) -> None:
+def remove_file(logger: logging.Logger, file_to_remove: str, *, simulate: bool = False) -> None:
     if os.path.exists(file_to_remove):
         logger.debug("Removing '%s'", file_to_remove)
         if not simulate:

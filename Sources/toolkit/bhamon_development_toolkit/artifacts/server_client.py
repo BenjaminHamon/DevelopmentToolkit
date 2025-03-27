@@ -78,8 +78,8 @@ class ArtifactServerFileClient:
             os.makedirs(directory_path, exist_ok = True)
 
 
-    def upload(self, # pylint: disable = too-many-arguments
-            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, overwrite = False, simulate = False):
+    def upload(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, *, overwrite = False, simulate = False):
 
         logger.info("Uploading artifact '%s' to repository '%s'",
             artifact_name, os.path.join(self.server_path, remote_repository))
@@ -100,8 +100,8 @@ class ArtifactServerFileClient:
             os.replace(remote_artifact_path + file_extension + ".tmp", remote_artifact_path + file_extension)
 
 
-    def download(self, # pylint: disable = too-many-arguments
-            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, simulate = False):
+    def download(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, *, simulate = False):
 
         logger.info("Downloading artifact '%s' from repository '%s'",
             artifact_name, os.path.join(self.server_path, remote_repository))
@@ -119,14 +119,15 @@ class ArtifactServerFileClient:
 
 
     def delete(self, # pylint: disable = too-many-arguments
-            repository, path_in_repository, artifact_name, file_extension, simulate = False):
+            repository, path_in_repository, artifact_name, file_extension, *, simulate = False):
+
         logger.info("Deleting artifact '%s'", artifact_name)
         file_path = os.path.join(self.server_path, repository, path_in_repository, artifact_name + file_extension)
         if not simulate:
             os.remove(file_path)
 
 
-    def delete_empty_directories(self, repository, path_in_repository, simulate = False):
+    def delete_empty_directories(self, repository, path_in_repository, *, simulate = False):
         current_directory = os.path.join(self.server_path, repository)
         if path_in_repository is not None:
             current_directory = os.path.join(current_directory, path_in_repository)
@@ -169,7 +170,7 @@ class ArtifactServerSshClient:
         return exists_result == 0
 
 
-    def create_directory(self, repository, path_in_repository, simulate = False):
+    def create_directory(self, repository, path_in_repository, *, simulate = False):
         mkdir_command = [ self.ssh_executable ] + self.ssh_parameters + [ self.server_user + "@" + self.server_host ]
         mkdir_command += [ "mkdir --parents %s" % (self.server_path + "/" + repository + "/" + path_in_repository) ]
 
@@ -182,8 +183,8 @@ class ArtifactServerSshClient:
                 raise RuntimeError("Failed to create directory: '%s'" % path_in_repository)
 
 
-    def upload(self, # pylint: disable = too-many-arguments
-            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, overwrite = False, simulate = False):
+    def upload(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, *, overwrite = False, simulate = False):
 
         logger.info("Uploading artifact '%s' to repository '%s'",
             artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)
@@ -222,8 +223,8 @@ class ArtifactServerSshClient:
                 raise RuntimeError("Failed to upload the artifact")
 
 
-    def download(self, # pylint: disable = too-many-arguments
-            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, simulate = False):
+    def download(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            local_repository, remote_repository, path_in_repository, artifact_name, file_extension, *, simulate = False):
 
         logger.info("Downloading artifact '%s' from repository '%s'",
             artifact_name, "ssh://" + self.server_host + ":" + self.server_path + "/" + remote_repository)

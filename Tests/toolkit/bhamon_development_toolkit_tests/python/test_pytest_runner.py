@@ -58,7 +58,8 @@ async def test_run_with_success(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     run_identifier = "my-run-identifier"
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = False) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = False) \
         .thenReturn(run_as_mock(run_identifier, result_directory, all_scopes[0].identifier))
 
     await pytest_runner.run(all_scopes, run_identifier, result_directory)
@@ -81,7 +82,8 @@ async def test_run_with_failure(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     run_identifier = "my-run-identifier"
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = False) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = False) \
         .thenReturn(run_as_mock(run_identifier, result_directory, all_scopes[0].identifier))
 
     with pytest.raises(RuntimeError):
@@ -101,7 +103,8 @@ async def test_run_with_internal_error(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     run_identifier = "my-run-identifier"
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = False) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = False) \
         .thenReturn(run_as_mock())
 
     with pytest.raises(RuntimeError):
@@ -125,7 +128,8 @@ async def test_run_with_no_tests(tmpdir):
     result_directory = os.path.join(tmpdir, "TestResults")
     run_identifier = "my-run-identifier"
 
-    mockito.when(process_runner).run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), mockito.any(list), check_exit_code = False) \
+    mockito.when(process_runner) \
+        .run(mockito.any(ExecutableCommand), mockito.any(ProcessOptions), output_handlers = mockito.any(list), check_exit_code = False) \
         .thenReturn(run_as_mock(run_identifier, result_directory, all_scopes[0].identifier))
 
     await pytest_runner.run(all_scopes, run_identifier, result_directory)

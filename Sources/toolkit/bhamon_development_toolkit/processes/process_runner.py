@@ -18,6 +18,7 @@ class ProcessRunner:
     async def run(self,
             command: ExecutableCommand,
             options: ProcessOptions,
+            *,
             output_handlers: Optional[List[ProcessOutputHandler]] = None,
             check_exit_code: bool = True
         ) -> ProcessResult:
@@ -52,6 +53,7 @@ class ProcessRunner:
     async def run_with_collector(self,
             command: ExecutableCommand,
             options: ProcessOptions,
+            *,
             check_exit_code: bool = True,
         ) -> ProcessResult:
 

@@ -29,7 +29,7 @@ class PytestRunner:
 
 
     async def run(self, # pylint: disable = too-many-arguments
-            all_scopes: List[PytestScope], run_identifier: str, base_result_directory: str,
+            all_scopes: List[PytestScope], run_identifier: str, base_result_directory: str, *,
             working_directory: Optional[str] = None, check_success: bool = True, simulate: bool = False) -> None:
 
         if len(all_scopes) == 0:
@@ -71,7 +71,8 @@ class PytestRunner:
 
 
     async def _run_with_scope(self, # pylint: disable = too-many-locals
-            scope: PytestScope, result_directory: str, working_directory: Optional[str] = None, simulate: bool = False) -> bool:
+            scope: PytestScope, result_directory: str, *,
+            working_directory: Optional[str] = None, simulate: bool = False) -> bool:
 
         log_file_path = os.path.join(result_directory, scope.identifier + ".log")
         json_report_file_path = os.path.join(result_directory, scope.identifier + ".json")
@@ -97,7 +98,7 @@ class PytestRunner:
 
         try:
             if not simulate:
-                result = await self._process_runner.run(command, process_options, output_handlers, check_exit_code = False)
+                result = await self._process_runner.run(command, process_options, output_handlers = output_handlers, check_exit_code = False)
             else:
                 result = ProcessResult(executable = self._python_executable, exit_code = 0)
         finally:

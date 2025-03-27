@@ -46,7 +46,7 @@ class ZipArchiveOperations(ArchiveOperationsBase):
                 raise RuntimeError("Archive '%s' is corrupted" % archive_path)
 
 
-    def _extract_implementation(self, archive_path: str, extraction_directory: str, file_collection: List[str], simulate: bool = False) -> None:
+    def _extract_implementation(self, archive_path: str, extraction_directory: str, file_collection: List[str], *, simulate: bool = False) -> None:
         logger.debug("Extracting files to '%s'", extraction_directory)
 
         with zipfile.ZipFile(archive_path, mode = "r") as archive_file:

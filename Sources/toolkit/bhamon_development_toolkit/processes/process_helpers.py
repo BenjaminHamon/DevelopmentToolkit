@@ -30,7 +30,7 @@ def create_raw_logger(stream: Optional[TextIO] = None, log_file_path: Optional[s
     return raw_logger
 
 
-def run_simple(logger: logging.Logger, command: ExecutableCommand,
+def run_simple(logger: logging.Logger, command: ExecutableCommand, *,
         working_directory: Optional[str] = None, check_exit_code: bool = True, simulate: bool = False) -> ProcessResult:
 
     logger.debug("+ %s", format_executable_command(command.get_command_for_logging()))
@@ -67,7 +67,7 @@ def run_simple(logger: logging.Logger, command: ExecutableCommand,
     )
 
 
-async def run_simple_async(logger: logging.Logger, command: ExecutableCommand,
+async def run_simple_async(logger: logging.Logger, command: ExecutableCommand, *,
         working_directory: Optional[str] = None, check_exit_code: bool = True, simulate: bool = False) -> ProcessResult:
 
     async def watch_output(stream: asyncio.StreamReader, logging_level: int) -> str:

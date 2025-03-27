@@ -28,7 +28,7 @@ class PyInstallerRunner:
 
 
     async def run(self, # pylint: disable = too-many-arguments
-            configuration: PyInstallerConfiguration, output_directory: str, intermediate_directory: str,
+            configuration: PyInstallerConfiguration, output_directory: str, intermediate_directory: str, *,
             clean: bool = False, log_level: Optional[str] = None, log_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         executable_path = os.path.join(output_directory, configuration.executable_name)
@@ -64,7 +64,7 @@ class PyInstallerRunner:
 
         try:
             if not simulate:
-                await self._process_runner.run(command, process_options, [ process_output_logger ], check_exit_code = True)
+                await self._process_runner.run(command, process_options, output_handlers = [ process_output_logger ], check_exit_code = True)
         finally:
             if log_file_path is not None:
                 logger.debug("Process log file: '%s'", log_file_path)

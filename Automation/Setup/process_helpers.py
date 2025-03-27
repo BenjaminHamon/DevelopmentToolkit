@@ -14,7 +14,8 @@ def format_executable_command_element(element: str) -> str:
 
 
 def run_simple(
-        logger: logging.Logger, command: List[str], working_directory: Optional[str] = None, simulate: bool = False) -> None:
+        logger: logging.Logger, command: List[str], *,
+        working_directory: Optional[str] = None, simulate: bool = False) -> None:
 
     logger.debug("+ %s", format_executable_command(command))
 
@@ -38,7 +39,8 @@ def run_simple(
 
 
 async def run_simple_async(
-        logger: logging.Logger, command: List[str], working_directory: Optional[str] = None, simulate: bool = False) -> None:
+        logger: logging.Logger, command: List[str], *,
+        working_directory: Optional[str] = None, simulate: bool = False) -> None:
 
     async def watch_output(stream: asyncio.StreamReader, logging_level: int) -> str:
         encoding = "utf-8"

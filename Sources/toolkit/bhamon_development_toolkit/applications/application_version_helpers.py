@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 
 
-def convert_version_to_numeric_tuple(version_identifier: str, expected_size: Optional[int] = None) -> Tuple[int,...]:
+def convert_version_to_numeric_tuple(version_identifier: str, *, expected_size: Optional[int] = None) -> Tuple[int,...]:
     version_number_list: List[int] = []
 
     for version_element in version_identifier.split("."):
