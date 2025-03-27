@@ -1,4 +1,4 @@
-# cspell:words asyncio pytest setuptools
+# cspell:words asyncio pylint pytest setuptools
 
 [build-system]
 requires = [ "setuptools >= 64" ]
@@ -11,9 +11,8 @@ description = "Automation scripts for the local project"
 requires-python = ">= 3.9"
 
 dependencies = [
-    "bhamon-development-toolkit[python] == 3.0.0+development",
-    "mockito ~= 1.5.0",
-    "pytest-asyncio ~= 0.24.0",
+    "bhamon-development-toolkit[python] == 3.1.0+development",
+    "mockito ~= 1.5.4",
 ]
 
 [project.scripts]
