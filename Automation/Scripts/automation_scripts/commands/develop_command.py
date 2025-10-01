@@ -35,7 +35,7 @@ class DevelopCommand(AutomationCommand):
             package_collection_for_pip.append(package.path_to_sources + "[all,dev]")
 
         logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
-        python_environment.setup_virtual_environment(simulate = simulate)
+        python_environment.setup_virtual_environment("pip.conf", simulate = simulate)
         python_environment.install_python_packages_for_development(package_collection_for_pip, simulate = simulate)
 
 

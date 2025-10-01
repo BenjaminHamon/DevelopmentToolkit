@@ -2,7 +2,8 @@ import logging
 import os
 from typing import Optional
 
-from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
+from benjaminhamon_standard_extensions.processes.process_output_handler import ProcessOutputHandler
+
 from bhamon_development_toolkit.python.pylint_issue import PylintIssue
 
 

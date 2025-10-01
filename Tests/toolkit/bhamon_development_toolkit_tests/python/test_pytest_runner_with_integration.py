@@ -5,8 +5,9 @@ import sys
 
 import pytest
 
-from bhamon_development_toolkit.processes.process_runner import ProcessRunner
-from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
+from benjaminhamon_standard_extensions.processes.process_runner import ProcessRunner
+from benjaminhamon_standard_extensions.processes.process_spawner import ProcessSpawner
+
 from bhamon_development_toolkit.python.pytest_runner import PytestRunner
 from bhamon_development_toolkit.python.pytest_scope import PytestScope
 

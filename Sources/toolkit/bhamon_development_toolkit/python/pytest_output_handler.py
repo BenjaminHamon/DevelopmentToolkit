@@ -5,7 +5,8 @@ import os
 import re
 from typing import Optional
 
-from bhamon_development_toolkit.processes.process_output_handler import ProcessOutputHandler
+from benjaminhamon_standard_extensions.processes.process_output_handler import ProcessOutputHandler
+
 from bhamon_development_toolkit.python.pytest_result import PytestResult
 from bhamon_development_toolkit.python.pytest_scope import PytestScope
 

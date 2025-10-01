@@ -5,9 +5,10 @@ import sys
 
 import pytest
 
-from bhamon_development_toolkit.processes.exceptions.process_failure_exception import ProcessFailureException
-from bhamon_development_toolkit.processes.process_runner import ProcessRunner
-from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
+from benjaminhamon_standard_extensions.processes.exceptions.process_failure_exception import ProcessFailureException
+from benjaminhamon_standard_extensions.processes.process_runner import ProcessRunner
+from benjaminhamon_standard_extensions.processes.process_spawner import ProcessSpawner
+
 from bhamon_development_toolkit.python.python_package import PythonPackage
 from bhamon_development_toolkit.python.python_package_builder import PythonPackageBuilder
 

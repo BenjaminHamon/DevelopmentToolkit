@@ -6,10 +6,11 @@ import os
 import mockito
 import pytest
 
-from bhamon_development_toolkit.processes.executable_command import ExecutableCommand
-from bhamon_development_toolkit.processes.process_options import ProcessOptions
-from bhamon_development_toolkit.processes.process_result import ProcessResult
-from bhamon_development_toolkit.processes.process_runner import ProcessRunner
+from benjaminhamon_standard_extensions.processes.executable_command import ExecutableCommand
+from benjaminhamon_standard_extensions.processes.process_options import ProcessOptions
+from benjaminhamon_standard_extensions.processes.process_result import ProcessResult
+from benjaminhamon_standard_extensions.processes.process_runner import ProcessRunner
+
 from bhamon_development_toolkit.python.pylint_runner import PylintRunner
 from bhamon_development_toolkit.python.pylint_scope import PylintScope
 

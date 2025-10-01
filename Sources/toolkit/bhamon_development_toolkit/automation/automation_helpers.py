@@ -9,8 +9,9 @@ import shutil
 import sys
 from typing import Generator, Optional
 
+from benjaminhamon_standard_extensions.logging import logging_helpers
+
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
-from bhamon_development_toolkit.logging import logging_helpers
 
 
 @contextlib.contextmanager
