@@ -208,7 +208,7 @@ class ProcessWatcher: # pylint: disable = too-many-instance-attributes
     def _check_timeouts(self) -> None:
 
         def check(start: float, timeout: datetime.timedelta, reason: str) -> None:
-            elapsed = datetime.timedelta(time.time() - start)
+            elapsed = datetime.timedelta(seconds = time.time() - start)
 
             if elapsed > timeout:
                 exception_message = "Subprocess timed out with reason %s" % reason
