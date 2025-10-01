@@ -9,8 +9,9 @@ import sys
 
 import pytest
 
-from bhamon_development_toolkit.processes.process_runner import ProcessRunner
-from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
+from benjaminhamon_standard_extensions.processes.process_runner import ProcessRunner
+from benjaminhamon_standard_extensions.processes.process_spawner import ProcessSpawner
+
 from bhamon_development_toolkit.python.pyinstaller_configuration import PyInstallerConfiguration
 from bhamon_development_toolkit.python.pyinstaller_runner import PyInstallerRunner
 
