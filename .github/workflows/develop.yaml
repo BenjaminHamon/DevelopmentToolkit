@@ -1,0 +1,90 @@
+---
+
+# cspell:words venv
+
+name: Development pipeline
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+
+  check_for_linux:
+    name: "Run checks and tests on Linux using Python ${{ matrix.python-version }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+
+    steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Set up automation
+        run: python Automation/Setup/setup.py --verbosity debug
+
+      - name: Check automation
+        run: python Automation/Setup/check.py --verbosity debug
+
+      - name: Set up sources
+        run: .venv-automation/bin/automation --verbosity debug develop
+
+      - name: Run linter
+        run: .venv-automation/bin/automation --verbosity debug lint
+
+      - name: Run tests
+        run: .venv-automation/bin/automation --verbosity debug test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CheckResults_Python-${{ matrix.python-version }}_Linux
+          path: Artifacts
+        if: always()
+
+  check_for_windows:
+    name: "Run checks and tests on Windows using Python ${{ matrix.python-version }}"
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+
+    steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Set up automation
+        run: python Automation/Setup/setup.py --verbosity debug
+
+      - name: Check automation
+        run: python Automation/Setup/check.py --verbosity debug
+
+      - name: Set up sources
+        run: .venv-automation/Scripts/automation.exe --verbosity debug develop
+
+      - name: Run linter
+        run: .venv-automation/Scripts/automation.exe --verbosity debug lint
+
+      - name: Run tests
+        run: .venv-automation/Scripts/automation.exe --verbosity debug test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CheckResults_Python-${{ matrix.python-version }}_Windows
+          path: Artifacts
+        if: always()
