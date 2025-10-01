@@ -1,6 +1,10 @@
+---
+
 # cspell:words pycache pytest venv
 
----
+files:
+  - "**"
+  - "**/.*/**"
 
 ignorePaths:
   - ".git/**"
@@ -11,11 +15,9 @@ ignorePaths:
   - "**/*.egg-info/**"
   - "Artifacts/**"
   - "Sources/*/build/**"
+  - "Sources/*/dist/**"
 
 words:
   - benjaminhamon
   - bhamon
   - hamon
-
-enableFiletypes:
-  - toml
