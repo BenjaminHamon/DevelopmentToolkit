@@ -24,7 +24,7 @@ class AsyncioContext:
 
         if system == "Windows":
             old_sigbreak_handler = signal.signal(signal.SIGBREAK, lambda signal_number, frame: self.shutdown()) # pylint: disable = no-member
-            old_signal_handlers.append((signal.SIGBREAK, old_sigbreak_handler))
+            old_signal_handlers.append((signal.SIGBREAK, old_sigbreak_handler)) # pylint: disable = no-member
 
         old_sigint_handler = signal.signal(signal.SIGINT, lambda signal_number, frame: self.shutdown())
         old_signal_handlers.append((signal.SIGINT, old_sigint_handler))
