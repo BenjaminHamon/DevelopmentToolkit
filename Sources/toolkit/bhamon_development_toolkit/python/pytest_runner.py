@@ -130,7 +130,7 @@ class PytestRunner:
         if exit_code == 1: # Tests were collected and run but some of the tests failed
             return
         if exit_code == 2: # Test execution was interrupted by the user
-            raise KeyboardInterrupt("Pytest execution was interrupted")
+            raise RuntimeError("Pytest execution was interrupted")
         if exit_code == 3: # Internal error happened while executing tests
             raise RuntimeError("Pytest internal error")
         if exit_code == 4: # pytest command line usage error

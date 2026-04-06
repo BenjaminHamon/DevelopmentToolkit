@@ -1,5 +1,8 @@
+# cspell:words caplog
+
 """ Integration tests for PytestRunner """
 
+import logging
 import os
 import sys
 
@@ -64,6 +67,32 @@ async def test_run_with_failure(tmpdir):
 
     with pytest.raises(RuntimeError):
         await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)
+
+
+@pytest.mark.asyncio
+async def test_run_with_syntax_error(tmpdir, caplog):
+    python_executable = sys.executable
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
+    pytest_runner = PytestRunner(process_runner, python_executable)
+
+    test_directory = os.path.join(tmpdir, "Tests")
+
+    os.makedirs(test_directory)
+    with open(os.path.join(test_directory, "test_my_module.py"), mode = "w", encoding = "utf-8") as test_file:
+        test_file.write("def")
+
+    all_scopes = [ PytestScope("All", "Tests", None) ]
+    run_identifier = "my-run-identifier"
+    result_directory = os.path.join(tmpdir, "TestResults")
+    working_directory = str(tmpdir)
+
+    with pytest.raises(RuntimeError):
+        await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)
+
+    error_messages = [ record for record in caplog.records if record.levelno == logging.ERROR ]
+
+    assert len(error_messages) == 1
+    assert error_messages[0].message == "Interrupted: 1 error during collection"
 
 
 @pytest.mark.asyncio
