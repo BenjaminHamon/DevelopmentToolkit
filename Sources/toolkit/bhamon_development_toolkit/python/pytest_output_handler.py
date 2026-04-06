@@ -23,14 +23,21 @@ class PytestOutputHandler(ProcessOutputHandler):
         status_collection = [ "passed", "failed", "skipped", "error", "xpassed", "xfailed" ]
         status_collection_regex = "|".join(x.upper() for x in status_collection)
 
+        self._interrupt_regex = re.compile(r"^!+ Interrupted: (?P<message>[^=]*) !+$")
         self._test_result_regex = re.compile(r"^(?P<identifier>.*)\s+(?P<status>" + status_collection_regex + r")\s+\[\s*[0-9]+%\]$")
 
 
     def process_stdout_line(self, line: str) -> None:
-        self._handle_line_as_test_result(line.rstrip())
+        line = line.rstrip()
+
+        self._handle_line_as_interrupt(line)
+        self._handle_line_as_test_result(line)
 
 
     def process_stderr_line(self, line: str) -> None:
+        line = line.rstrip()
+
+        self._handle_line_as_interrupt(line)
         self._handle_line_as_test_result(line.rstrip())
 
 
@@ -40,6 +47,12 @@ class PytestOutputHandler(ProcessOutputHandler):
 
     def process_stderr_end(self) -> None:
         pass
+
+
+    def _handle_line_as_interrupt(self, line: str) -> None:
+        interrupt_match = re.search(self._interrupt_regex, line)
+        if interrupt_match is not None:
+            logger.error("Interrupted: %s", interrupt_match.group("message"))
 
 
     def _handle_line_as_test_result(self, line: str) -> None:
