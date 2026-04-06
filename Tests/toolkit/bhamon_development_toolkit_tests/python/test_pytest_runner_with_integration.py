@@ -67,6 +67,27 @@ async def test_run_with_failure(tmpdir):
 
 
 @pytest.mark.asyncio
+async def test_run_with_syntax_error(tmpdir):
+    python_executable = sys.executable
+    process_runner = ProcessRunner(ProcessSpawner(is_console = True))
+    pytest_runner = PytestRunner(process_runner, python_executable)
+
+    test_directory = os.path.join(tmpdir, "Tests")
+
+    os.makedirs(test_directory)
+    with open(os.path.join(test_directory, "test_my_module.py"), mode = "w", encoding = "utf-8") as test_file:
+        test_file.write("def")
+
+    all_scopes = [ PytestScope("All", "Tests", None) ]
+    run_identifier = "my-run-identifier"
+    result_directory = os.path.join(tmpdir, "TestResults")
+    working_directory = str(tmpdir)
+
+    with pytest.raises(RuntimeError):
+        await pytest_runner.run(all_scopes, run_identifier, result_directory, working_directory = working_directory)
+
+
+@pytest.mark.asyncio
 async def test_run_with_no_tests(tmpdir):
     python_executable = sys.executable
     process_runner = ProcessRunner(ProcessSpawner(is_console = True))
